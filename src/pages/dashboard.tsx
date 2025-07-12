@@ -23,7 +23,6 @@ export const Dashboard = () => {
         if (!res.ok) throw new Error("Failed to fetch posts");
 
         const data = await res.json();
-        console.log(data.data)
         dispatch({ type: "ADD", payload: data.data });
       } catch (err) {
         console.log("Error fetching posts:", err);

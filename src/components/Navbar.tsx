@@ -32,7 +32,7 @@ export function Navbar() {
     })
 
   return (
-    <NavigationMenu className="mb-5">
+    <NavigationMenu className="m-5">
       <NavigationMenuList>
         <NavigationMenuItem>
           <NavigationMenuLink asChild className={getLinkClass("/")}>
