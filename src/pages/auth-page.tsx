@@ -27,7 +27,7 @@ export function AuthTab() {
       const response = await fetch(`${baseUrl}/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: regNo, password: password }),
+        body: JSON.stringify({ username: regNo.toLowerCase, password: password }),
       });
 
       const data = await response.json();
