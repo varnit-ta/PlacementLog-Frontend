@@ -119,6 +119,7 @@ const Editor: React.FC<EditorProps> = ({ onContentChange }) => {
   return (
     <div className="max-w-3xl mx-auto">
       <RichTextEditor
+        dark={false}
         output="html"
         content={content}
         onChangeContent={handleChange}

@@ -13,10 +13,8 @@ export default function App() {
 	return (
 		<div className="min-h-screen grid grid-rows-[auto_1fr_auto]">
 			<BrowserRouter>
-				{/* Navbar at the top */}
 				<Navbar />
 
-				{/* Main content */}
 				<div className="p-5">
 					<Routes>
 						<Route path="/" element={<Dashboard />} />
@@ -28,7 +26,6 @@ export default function App() {
 					</Routes>
 				</div>
 
-				{/* Footer at the bottom */}
 				<footer className="text-center text-sm text-muted-foreground py-4 border-t bg-white">
 					Contribute or Fix issue on{" "}
 					<a

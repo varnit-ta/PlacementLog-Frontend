@@ -3,7 +3,7 @@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { useContext, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import Editor from '@/components/editor';
 import { UserContext } from '@/context/user-context';
 
@@ -54,6 +54,16 @@ export const PostCreationForm = () => {
 
   const userContext = useContext(UserContext);
   const currentUser = userContext?.state;
+  const dispatch = userContext?.dispatch;
+
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      if (!dispatch)
+        return
+      dispatch({ type: "LOGIN", payload: JSON.parse(storedUser) });
+    }
+  }, []);
 
   const handleSubmit = async () => {
     if (!currentUser) {
@@ -70,8 +80,6 @@ export const PostCreationForm = () => {
       rounds,
       experience,
     });
-
-    // Optional: Clear form or redirect
   };
 
   return (
