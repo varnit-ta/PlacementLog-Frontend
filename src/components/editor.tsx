@@ -3,9 +3,6 @@ import RichTextEditor, { BaseKit } from 'reactjs-tiptap-editor';
 
 import {
   BubbleMenuKatex,
-  BubbleMenuDrawer,
-  BubbleMenuExcalidraw,
-  BubbleMenuMermaid,
 } from 'reactjs-tiptap-editor/bubble-extra';
 
 import { Blockquote } from 'reactjs-tiptap-editor/blockquote';
@@ -43,9 +40,6 @@ import { TextAlign } from 'reactjs-tiptap-editor/textalign';
 import { TextUnderline } from 'reactjs-tiptap-editor/textunderline';
 import { TextDirection } from 'reactjs-tiptap-editor/textdirection';
 import { Katex } from 'reactjs-tiptap-editor/katex';
-import { Drawer } from 'reactjs-tiptap-editor/drawer';
-import { Excalidraw } from 'reactjs-tiptap-editor/excalidraw';
-import { Mermaid } from 'reactjs-tiptap-editor/mermaid';
 
 import 'reactjs-tiptap-editor/style.css';
 import 'prism-code-editor-lightweight/layout.css';
@@ -53,7 +47,6 @@ import 'prism-code-editor-lightweight/themes/github-dark.css';
 import 'katex/dist/katex.min.css';
 import 'easydrawer/styles.css';
 import 'react-image-crop/dist/ReactCrop.css';
-import '@excalidraw/excalidraw/index.css';
 
 function debounce<T extends (...args: any[]) => void>(func: T, wait: number): T {
   let timeout: ReturnType<typeof setTimeout>;
@@ -106,29 +99,6 @@ const extensions = [
   TextDirection,
   Mention,
   Katex,
-  Excalidraw,
-  Mermaid.configure({
-    upload: (file: File) =>
-      new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onloadend = () => {
-          const blob = new Blob([reader.result as any]);
-          resolve(URL.createObjectURL(blob));
-        };
-      }),
-  }),
-  Drawer.configure({
-    upload: (file: File) =>
-      new Promise((resolve) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onloadend = () => {
-          const blob = new Blob([reader.result as any]);
-          resolve(URL.createObjectURL(blob));
-        };
-      }),
-  }),
 ];
 
 interface EditorProps {
@@ -141,7 +111,7 @@ const Editor: React.FC<EditorProps> = ({ onContentChange }) => {
   const handleChange = useCallback(
     debounce((value: string) => {
       setContent(value);
-      onContentChange?.(value); // notify parent
+      onContentChange?.(value);
     }, 500),
     []
   );
@@ -160,15 +130,6 @@ const Editor: React.FC<EditorProps> = ({ onContentChange }) => {
                 {bubbleDefaultDom}
                 {extensionsNames.includes('katex') && (
                   <BubbleMenuKatex editor={editor} disabled={disabled} />
-                )}
-                {extensionsNames.includes('drawer') && (
-                  <BubbleMenuDrawer editor={editor} disabled={disabled} />
-                )}
-                {extensionsNames.includes('excalidraw') && (
-                  <BubbleMenuExcalidraw editor={editor} disabled={disabled} />
-                )}
-                {extensionsNames.includes('mermaid') && (
-                  <BubbleMenuMermaid editor={editor} disabled={disabled} />
                 )}
               </>
             );
