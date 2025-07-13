@@ -13,61 +13,139 @@ import "prism-code-editor-lightweight/themes/github-dark.css";
 import "katex/dist/katex.min.css";
 import "easydrawer/styles.css";
 import "@excalidraw/excalidraw/index.css";
+import { Building2, User, Clock, CheckCircle, AlertCircle } from "lucide-react";
 
 interface PostCardProps {
   post: {
     id?: string;
+    user_id?: string;
     post_body: {
       companyName?: string;
-      user?: string;
+      company?: string;
       role?: string;
       ctc?: string;
       cgpa?: string;
-      rounds?: string;
+      rounds?: any;
       experience?: string;
+      user?: string;
+      [key: string]: any;
     };
+    reviewed?: boolean;
   };
 }
 
 export const PostCard = ({ post }: PostCardProps) => {
   const {
-    companyName = "Unknown Company",
-    user = "Anonymous",
+    companyName,
+    company,
     role,
     ctc,
     cgpa,
     rounds,
     experience,
+    user,
   } = post.post_body || {};
 
-  return (
-    <Accordion type="single" collapsible className="w-full rounded-lg border mb-4 shadow-sm">
-      <AccordionItem value={post.id || `${companyName}-${user}`}>
-        <AccordionTrigger className="p-4">
-          <div className="flex justify-between w-full text-left items-center">
-            <div className="text-lg font-semibold">{companyName}</div>
-            <span className="text-sm text-muted-foreground ml-4">by {user}</span>
-          </div>
-        </AccordionTrigger>
-        <AccordionContent className="p-5 bg-muted/20 text-muted-foreground rounded-b-md">
-          <div className="space-y-2 text-sm leading-relaxed text-foreground">
-            <p><strong>Role:</strong> {role || "N/A"}</p>
-            <p><strong>CTC:</strong> {ctc || "N/A"} LPA</p>
-            <p><strong>CGPA:</strong> {cgpa || "N/A"}</p>
-            <p><strong>Rounds:</strong> {rounds || "N/A"}</p>
+  // Use companyName if available, otherwise fall back to company
+  const companyDisplay = companyName || company || "Unknown Company";
 
-            {experience && (
-              <div className="pt-3">
-                <strong className="block mb-1">Experience:</strong>
-                <div
-                  className="prose prose-sm sm:prose-base max-w-none tiptap-content border border-border bg-background rounded-md p-4 shadow-inner"
-                  dangerouslySetInnerHTML={{ __html: experience }}
-                />
+  // Decode HTML entities in experience content
+  const decodeHtml = (html: string) => {
+    const txt = document.createElement('textarea');
+    txt.innerHTML = html;
+    return txt.value;
+  };
+
+  const decodedExperience = experience ? decodeHtml(experience) : '';
+
+  return (
+    <div className="bg-white rounded-xl shadow-sm border border-gray-200 hover:shadow-md transition-all duration-200 overflow-hidden tiptap-content">
+      <div className="p-6">
+        {/* Header */}
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex-1">
+            <div className="flex items-center space-x-2 mb-2">
+              <div className="w-10 h-10 bg-gray-200 rounded-lg flex items-center justify-center">
+                <Building2 className="w-5 h-5 text-gray-700" />
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">{companyDisplay}</h3>
+                <p className="text-sm text-gray-600">{role || "Role not specified"}</p>
+              </div>
+            </div>
+          </div>
+          
+          {/* Status Badge */}
+          <div className="flex items-center space-x-2">
+            {post.reviewed === false ? (
+              <div className="flex items-center space-x-1 px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">
+                <AlertCircle className="w-3 h-3" />
+                <span>Pending</span>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-1 px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+                <CheckCircle className="w-3 h-3" />
+                <span>Approved</span>
               </div>
             )}
           </div>
-        </AccordionContent>
-      </AccordionItem>
-    </Accordion>
+        </div>
+
+        {/* User Info */}
+        <div className="flex items-center space-x-2 mb-4">
+          <div className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center">
+            <User className="w-3 h-3 text-gray-600" />
+          </div>
+          <span className="text-sm text-gray-600">by {post.user_id || user}</span>
+        </div>
+
+        {/* Details Grid */}
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          {ctc && (
+            <div className="bg-gray-50 rounded-lg p-3">
+              <p className="text-xs font-medium text-gray-700 uppercase tracking-wide">CTC</p>
+              <p className="text-lg font-semibold text-gray-900">{ctc} LPA</p>
+            </div>
+          )}
+          
+          {cgpa && (
+            <div className="bg-gray-50 rounded-lg p-3">
+              <p className="text-xs font-medium text-gray-700 uppercase tracking-wide">CGPA</p>
+              <p className="text-lg font-semibold text-gray-900">{cgpa}</p>
+            </div>
+          )}
+          
+          {rounds && (
+            <div className="bg-gray-50 rounded-lg p-3">
+              <p className="text-xs font-medium text-gray-700 uppercase tracking-wide">Rounds</p>
+              <p className="text-lg font-semibold text-gray-900">{rounds}</p>
+            </div>
+          )}
+        </div>
+
+        {/* Experience Section */}
+        {decodedExperience && (
+          <Accordion type="single" collapsible className="w-full">
+            <AccordionItem value="experience" className="border-none">
+              <AccordionTrigger className="py-2 hover:no-underline">
+                <div className="flex items-center space-x-2 text-sm font-medium text-gray-700">
+                  <Clock className="w-4 h-4" />
+                  <span>View Experience</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="pt-2">
+                <div className="prose prose-gray max-w-none bg-gray-50 rounded-lg shadow p-5 border border-gray-100">
+                  <div
+                    className="prose max-w-none"
+                    style={{ wordBreak: 'break-word' }}
+                    dangerouslySetInnerHTML={{ __html: decodedExperience }}
+                  />
+                </div>
+              </AccordionContent>
+            </AccordionItem>
+          </Accordion>
+        )}
+      </div>
+    </div>
   );
 };

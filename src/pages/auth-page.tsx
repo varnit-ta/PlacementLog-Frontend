@@ -4,11 +4,11 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter }
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { AppWindowIcon } from "lucide-react";
 import { UserContext } from "@/context/user-context";
 import { useNavigate } from "react-router-dom";
-
-const baseUrl = import.meta.env.VITE_API_URL;
+import { apiService } from "@/lib/api";
+import { User, Lock, Mail, Shield } from "lucide-react";
+import { toast } from "sonner";
 
 export function AuthTab() {
   const { dispatch } = useContext(UserContext)!;
@@ -16,6 +16,7 @@ export function AuthTab() {
 
   const [regNo, setRegNo] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const resetForm = () => {
     setRegNo("");
@@ -23,127 +24,231 @@ export function AuthTab() {
   };
 
   const handleLogin = async () => {
+    if (!regNo || !password) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+
+    setIsLoading(true);
     try {
-      const response = await fetch(`${baseUrl}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: regNo.toLowerCase(), password: password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) throw new Error(data.message || "Login failed");
-
-      dispatch({ type: "LOGIN", payload: { userId: data.data.username, token: data.data.token } });
+      const data = await apiService.login(regNo.toLowerCase(), password);
+      
+      // Store user data with userId (from userid field)
+      const userData = {
+        userId: data.userid,
+        username: data.username,
+        token: data.token
+      };
+      
+      dispatch({ type: "LOGIN", payload: userData });
       resetForm();
 
-      localStorage.setItem("user", JSON.stringify({
-        userId: data.data.username,
-        token: data.data.token
-      }));
+      localStorage.setItem("user", JSON.stringify(userData));
+      toast.success("Login successful!");
 
-      navigate("/")
-    } catch (err) {
+      navigate("/");
+    } catch (err: any) {
       console.error("Login error:", err);
-      alert("Login failed. Check credentials.");
+      toast.error(err.message || "Login failed. Check credentials.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleSignup = async () => {
+    if (!regNo || !password) {
+      toast.error("Please fill in all fields");
+      return;
+    }
+
+    setIsLoading(true);
     try {
-      const response = await fetch(`${baseUrl}/auth/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ username: regNo, password: password }),
-      });
-
-      const data = await response.json();
-
-      if (!response.ok) throw new Error(data.message || "Signup failed");
-
-      dispatch({ type: "LOGIN", payload: { userId: data.data.username, token: data.data.token } });
+      const data = await apiService.register(regNo.toLowerCase(), password);
+      
+      // Store user data with userId (from userid field)
+      const userData = {
+        userId: data.userid,
+        username: data.username,
+        token: data.token
+      };
+      
+      dispatch({ type: "LOGIN", payload: userData });
       resetForm();
 
-      localStorage.setItem("user", JSON.stringify({
-        userId: data.data.username,
-        token: data.data.token
-      }));
+      localStorage.setItem("user", JSON.stringify(userData));
+      toast.success("Account created successfully!");
 
-      navigate("/")
-    } catch (err) {
+      navigate("/");
+    } catch (err: any) {
       console.error("Signup error:", err);
-      alert("Signup failed. Try again.");
+      toast.error(err.message || "Signup failed. Try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="flex w-full max-w-sm flex-col gap-6">
-      <Tabs defaultValue="login">
-        <TabsList className="gap-1 justify-center">
-          <AppWindowIcon />
-          <TabsTrigger value="login">Login</TabsTrigger>
-          <TabsTrigger value="signup">Signup</TabsTrigger>
-        </TabsList>
+    <div className="min-h-screen bg-white flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-md w-full space-y-8">
+        {/* Header */}
+        <div className="text-center">
+          <div className="mx-auto h-12 w-12 bg-black rounded-full flex items-center justify-center mb-4">
+            <User className="h-6 w-6 text-white" />
+          </div>
+          <h2 className="text-3xl font-bold text-gray-900 mb-2">Welcome Back</h2>
+          <p className="text-gray-600">Sign in to your account or create a new one</p>
+        </div>
 
-        <TabsContent value="login">
-          <Card>
-            <CardHeader>
-              <CardTitle>Login</CardTitle>
-              <CardDescription>
-                Log in to your account to manage your posts — track, create, and delete entries related to your placement journey.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="login-reg">Registration No</Label>
-                <Input id="login-reg" placeholder="22BIT0001" value={regNo} onChange={(e) => setRegNo(e.target.value)} />
-              </div>
-              <div className="grid gap-2">
-                <Label htmlFor="login-pass">Password</Label>
-                <Input id="login-pass" type="password" placeholder="Your password" value={password} onChange={(e) => setPassword(e.target.value)} />
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button className="w-full" onClick={handleLogin}>Log In</Button>
-            </CardFooter>
-          </Card>
-        </TabsContent>
+        {/* Auth Tabs */}
+        <div className="bg-white rounded-2xl shadow-xl border border-gray-200 p-8">
+          <Tabs defaultValue="login" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 mb-8">
+              <TabsTrigger value="login" className="text-sm font-medium">
+                Sign In
+              </TabsTrigger>
+              <TabsTrigger value="signup" className="text-sm font-medium">
+                Sign Up
+              </TabsTrigger>
+            </TabsList>
 
-        <TabsContent value="signup">
-          <Card>
-            <CardHeader>
-              <CardTitle>Signup</CardTitle>
-              <CardDescription>
-                Sign up to manage your posts — track, create, and delete entries related to your placement journey.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="grid gap-4">
-              <div className="grid gap-2">
-                <Label htmlFor="signup-reg">Registration No</Label>
-                <Input id="signup-reg" placeholder="22BIT0001" value={regNo} onChange={(e) => setRegNo(e.target.value)} />
+            <TabsContent value="login" className="space-y-6">
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="login-reg" className="text-sm font-medium text-gray-700">
+                    Registration Number
+                  </Label>
+                  <div className="mt-1 relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Mail className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <Input 
+                      id="login-reg" 
+                      placeholder="22BIT0001" 
+                      value={regNo} 
+                      onChange={(e) => setRegNo(e.target.value)}
+                      disabled={isLoading}
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <Label htmlFor="login-pass" className="text-sm font-medium text-gray-700">
+                    Password
+                  </Label>
+                  <div className="mt-1 relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Lock className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <Input 
+                      id="login-pass" 
+                      type="password" 
+                      placeholder="Your password" 
+                      value={password} 
+                      onChange={(e) => setPassword(e.target.value)}
+                      disabled={isLoading}
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
               </div>
-              <div className="grid gap-2">
-                <Label htmlFor="signup-pass">Password</Label>
-                <Input id="signup-pass" type="password" placeholder="Create a password" value={password} onChange={(e) => setPassword(e.target.value)} />
+
+              <Button 
+                className="w-full bg-black hover:bg-gray-800 text-white font-medium py-3"
+                onClick={handleLogin}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <div className="flex items-center space-x-2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    <span>Signing in...</span>
+                  </div>
+                ) : (
+                  "Sign In"
+                )}
+              </Button>
+            </TabsContent>
+
+            <TabsContent value="signup" className="space-y-6">
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="signup-reg" className="text-sm font-medium text-gray-700">
+                    Registration Number
+                  </Label>
+                  <div className="mt-1 relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Mail className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <Input 
+                      id="signup-reg" 
+                      placeholder="22BIT0001" 
+                      value={regNo} 
+                      onChange={(e) => setRegNo(e.target.value)}
+                      disabled={isLoading}
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
+                
+                <div>
+                  <Label htmlFor="signup-pass" className="text-sm font-medium text-gray-700">
+                    Create Password
+                  </Label>
+                  <div className="mt-1 relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <Lock className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <Input 
+                      id="signup-pass" 
+                      type="password" 
+                      placeholder="Create a password" 
+                      value={password} 
+                      onChange={(e) => setPassword(e.target.value)}
+                      disabled={isLoading}
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
               </div>
-            </CardContent>
-            <CardFooter>
-              <Button className="w-full" onClick={handleSignup}>Sign Up</Button>
-            </CardFooter>
-          </Card>
-        </TabsContent>
-      </Tabs>
+
+              <Button 
+                className="w-full bg-gray-800 hover:bg-gray-900 text-white font-medium py-3"
+                onClick={handleSignup}
+                disabled={isLoading}
+              >
+                {isLoading ? (
+                  <div className="flex items-center space-x-2">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    <span>Creating account...</span>
+                  </div>
+                ) : (
+                  "Create Account"
+                )}
+              </Button>
+            </TabsContent>
+          </Tabs>
+
+          {/* Admin Link */}
+          <div className="mt-6 pt-6 border-t border-gray-200">
+            <div className="text-center">
+              <p className="text-sm text-gray-600">
+                Admin?{" "}
+                <button 
+                  onClick={() => navigate("/admin-auth")}
+                  className="text-gray-900 hover:text-gray-700 underline font-medium"
+                >
+                  Login here
+                </button>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
 
-
-
 export const AuthPage = () => {
-  return (
-    <div className="flex items-center justify-center">
-      <AuthTab />
-    </div>
-  );
+  return <AuthTab />;
 };
 

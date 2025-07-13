@@ -2,6 +2,7 @@ import React, { createContext, useEffect, useReducer } from "react";
 
 type UserType = {
 	userId: string;
+	username: string;
 	token: string;
 } | null;
 
@@ -37,7 +38,21 @@ export const UserContextProvider = ({
 	useEffect(() => {
 		const storedUser = localStorage.getItem("user");
 		if (storedUser) {
-			dispatch({ type: "LOGIN", payload: JSON.parse(storedUser) });
+			try {
+				const userData = JSON.parse(storedUser);
+				// Handle both old format (userId) and new format (userid from backend)
+				const userId = userData.userId || userData.userid;
+				const username = userData.username;
+				if (userId && userData.token) {
+					dispatch({ 
+						type: "LOGIN", 
+						payload: { userId, username, token: userData.token } 
+					});
+				}
+			} catch (error) {
+				console.error("Error parsing stored user data:", error);
+				localStorage.removeItem("user");
+			}
 		}
 	}, []);
 

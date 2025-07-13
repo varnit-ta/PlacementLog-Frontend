@@ -1,20 +1,22 @@
 import React, { createContext, useReducer } from "react";
 
-// Matches actual structure returned from backend
 export type PostBody = {
-  companyName: string;
-  user: string;
-  role: string;
-  ctc: string;
-  cgpa: string;
-  rounds: string;
-  experience: string;
+  companyName?: string;
+  company?: string;
+  role?: string;
+  ctc?: string;
+  cgpa?: string;
+  rounds?: any;
+  experience?: string;
+  user?: string;
+  [key: string]: any; // Allow additional fields
 };
 
 export type Post = {
   id: string;             // UUID string
   user_id: string;
   post_body: PostBody;
+  reviewed?: boolean;
 };
 
 type StateType = Post[];

@@ -1,60 +1,135 @@
 import * as React from "react"
 import { Link, useNavigate, useLocation } from "react-router-dom"
-import {
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  navigationMenuTriggerStyle,
-} from "@/components/ui/navigation-menu"
 import { UserContext } from "@/context/user-context"
-import clsx from "clsx"
 import { useContext } from "react"
+import { apiService } from "@/lib/api"
+import { 
+  Home, 
+  Plus, 
+  Shield, 
+  LogIn, 
+  LogOut, 
+  User
+} from "lucide-react"
 
 export function Navbar() {
-    const userContext = useContext(UserContext)
-    const user = userContext?.state
-
-
+  const userContext = useContext(UserContext)
+  const user = userContext?.state
   const navigate = useNavigate()
   const location = useLocation()
   const { dispatch } = React.useContext(UserContext)!
 
-  const handleSignOut = () => {
-    dispatch({ type: "LOGOUT" })
-    localStorage.removeItem("user")
-    navigate("/")
+  const handleSignOut = async () => {
+    try {
+      await apiService.logout();
+    } catch (error) {
+      console.error('Logout API error:', error);
+    } finally {
+      dispatch({ type: "LOGOUT" })
+      localStorage.removeItem("user")
+      navigate("/")
+    }
   }
 
-  const getLinkClass = (path: string) =>
-    clsx(navigationMenuTriggerStyle(), {
-      "bg-muted font-semibold": location.pathname === path,
-    })
+  const isActive = (path: string) => location.pathname === path
+  const isAdmin = apiService.isUserAdmin()
 
   return (
-    <NavigationMenu className="m-5">
-      <NavigationMenuList>
-        <NavigationMenuItem>
-          <NavigationMenuLink asChild className={getLinkClass("/")}>
-            <Link to="/">Dashboard</Link>
-          </NavigationMenuLink>
-        </NavigationMenuItem>
+    <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-16">
+          {/* Logo and Brand */}
+          <div className="flex items-center">
+            <Link to="/" className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
+                <img src="/vite.svg" alt="Logo" className="w-5 h-5" />
+              </div>
+              <span className="text-xl font-bold text-gray-900">PlacementLog</span>
+            </Link>
+          </div>
 
-        <NavigationMenuItem>
-          <NavigationMenuLink asChild className={getLinkClass("/create")}>
-            <Link to="/create">Create</Link>
-          </NavigationMenuLink>
-        </NavigationMenuItem>
+          {/* Navigation Links */}
+          <div className="hidden md:flex items-center space-x-8">
+            <Link
+              to="/"
+              className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                isActive("/") 
+                  ? "bg-gray-100 text-gray-900" 
+                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+              }`}
+            >
+              <Home className="w-4 h-4" />
+              <span>Dashboard</span>
+            </Link>
 
-        <NavigationMenuItem className={user ? "" : "hidden"}>
-          <button
-            onClick={handleSignOut}
-            className={navigationMenuTriggerStyle()}
-          >
-            Signout
-          </button>
-        </NavigationMenuItem>
-      </NavigationMenuList>
-    </NavigationMenu>
+            <Link
+              to="/create"
+              className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                isActive("/create") 
+                  ? "bg-gray-100 text-gray-900" 
+                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+              }`}
+            >
+              <Plus className="w-4 h-4" />
+              <span>Create Post</span>
+            </Link>
+
+            {isAdmin && (
+              <Link
+                to="/admin"
+                className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  isActive("/admin") 
+                    ? "bg-gray-100 text-gray-900" 
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                }`}
+              >
+                <Shield className="w-4 h-4" />
+                <span>Admin</span>
+              </Link>
+            )}
+          </div>
+
+          {/* User Menu */}
+          <div className="flex items-center space-x-4">
+            {user ? (
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2">
+                  <div className="w-8 h-8 bg-gray-200 rounded-full flex items-center justify-center">
+                    <User className="w-4 h-4 text-gray-700" />
+                  </div>
+                  <span className="text-sm font-medium text-gray-700 hidden sm:block">
+                    {user.username}
+                  </span>
+                </div>
+                <button
+                  onClick={handleSignOut}
+                  className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span className="hidden sm:block">Logout</span>
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center space-x-3">
+                <Link
+                  to="/auth"
+                  className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
+                >
+                  <LogIn className="w-4 h-4" />
+                  <span className="hidden sm:block">Login</span>
+                </Link>
+                <Link
+                  to="/admin-auth"
+                  className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-white bg-black hover:bg-gray-800 rounded-md transition-colors"
+                >
+                  <Shield className="w-4 h-4" />
+                  <span className="hidden sm:block">Admin</span>
+                </Link>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </nav>
   )
 }
