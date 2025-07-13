@@ -2,7 +2,7 @@ import { PostsContext } from "@/context/posts-context";
 import { useContext, useEffect, useState } from "react";
 import { PostCard } from "@/components/postcard";
 import { apiService } from "@/lib/api";
-import { Search, Filter, TrendingUp } from "lucide-react";
+import { Search, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 
 export const Dashboard = () => {

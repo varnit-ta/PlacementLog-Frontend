@@ -1,13 +1,12 @@
 import { useState, useContext } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { UserContext } from "@/context/user-context";
 import { useNavigate } from "react-router-dom";
 import { apiService } from "@/lib/api";
-import { User, Lock, Mail, Shield } from "lucide-react";
+import { User, Lock, Mail } from "lucide-react";
 import { toast } from "sonner";
 
 export function AuthTab() {
