@@ -41,7 +41,7 @@ export function Navbar() {
           {/* Logo and Brand */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-black rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center">
                 <img src="/vite.svg" alt="Logo" className="w-5 h-5" />
               </div>
               <span className="text-xl font-bold text-gray-900">PlacementLog</span>
