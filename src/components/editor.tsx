@@ -48,14 +48,6 @@ import 'katex/dist/katex.min.css';
 import 'easydrawer/styles.css';
 import 'react-image-crop/dist/ReactCrop.css';
 
-function debounce<T extends (...args: any[]) => void>(func: T, wait: number): T {
-  let timeout: ReturnType<typeof setTimeout>;
-  return function (...args: Parameters<T>) {
-    clearTimeout(timeout);
-    timeout = setTimeout(() => func(...args), wait);
-  } as T;
-}
-
 const extensions = [
   BaseKit.configure({
     placeholder: { showOnlyCurrent: true },

@@ -7,7 +7,6 @@ import { CheckCircle, XCircle, Trash2, Shield, Clock, CheckSquare, AlertTriangle
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import "@/styles/tiptap.css";
 import { PostCard } from "@/components/postcard";
 
