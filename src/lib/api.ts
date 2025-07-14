@@ -4,7 +4,7 @@ export interface User {
   userId: string;
   username: string;
   token: string;
-  role?: string; // Add role field
+  role?: string;
 }
 
 export interface PostBody {
@@ -16,7 +16,7 @@ export interface PostBody {
   rounds?: any;
   experience?: string;
   user?: string;
-  [key: string]: any; // Allow additional fields
+  [key: string]: any;
 }
 
 export interface Post {
@@ -40,7 +40,6 @@ export interface ApiResponse<T> {
 }
 
 class ApiService {
-  // Decode JWT token to extract role information
   private decodeToken(token: string): { userId: string; role: string } | null {
     try {
       const base64Url = token.split('.')[1];

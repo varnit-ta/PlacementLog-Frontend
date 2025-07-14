@@ -21,7 +21,7 @@ export const Dashboard = () => {
 
       try {
         const posts = await apiService.getAllPosts();
-        console.log("Fetched posts:", posts); // Debug log
+        //console.log("Fetched posts:", posts); // Debug log
         dispatch({ type: "ADD", payload: posts });
       } catch (err: any) {
         console.error("Error fetching posts:", err);
@@ -38,7 +38,7 @@ export const Dashboard = () => {
 
   // Ensure posts is always an array and handle the search filtering
   const posts = Array.isArray(postContext?.state) ? postContext.state : [];
-  console.log("Posts from context:", posts); // Debug log
+  //console.log("Posts from context:", posts); // Debug log
   
   const filteredPosts = posts.filter((post: any) => {
     if (!searchTerm) return true;
@@ -54,7 +54,7 @@ export const Dashboard = () => {
     );
   });
 
-  console.log("Filtered posts:", filteredPosts); // Debug log
+  //console.log("Filtered posts:", filteredPosts); // Debug log
 
   if (isLoading) {
     return (
