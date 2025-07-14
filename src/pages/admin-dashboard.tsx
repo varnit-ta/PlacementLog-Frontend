@@ -5,12 +5,23 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle, XCircle, Trash2, Shield, Clock, CheckSquare, AlertTriangle, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import "@/styles/tiptap.css";
+import { PostCard } from "@/components/postcard";
 
 export const AdminDashboard = () => {
   const [posts, setPosts] = useState<Post[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { state: user } = useContext(UserContext)!;
+
+  // Admin registration state
+  const [newAdminUsername, setNewAdminUsername] = useState("");
+  const [newAdminPassword, setNewAdminPassword] = useState("");
+  const [isRegistering, setIsRegistering] = useState(false);
+  const [registerSuccess, setRegisterSuccess] = useState<{ username: string; password: string } | null>(null);
 
   useEffect(() => {
     if (!user) {
@@ -78,6 +89,27 @@ export const AdminDashboard = () => {
         </div>
       </div>
     ), { duration: 10000 });
+  };
+
+  // Admin registration handler
+  const handleAdminRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newAdminUsername || !newAdminPassword) {
+      toast.error("Please fill in both username and password");
+      return;
+    }
+    setIsRegistering(true);
+    try {
+      await apiService.adminRegister(newAdminUsername, newAdminPassword);
+      setRegisterSuccess({ username: newAdminUsername, password: newAdminPassword });
+      setNewAdminUsername("");
+      setNewAdminPassword("");
+      toast.success("New admin registered successfully!");
+    } catch (err: any) {
+      toast.error(err.message || "Failed to register new admin");
+    } finally {
+      setIsRegistering(false);
+    }
   };
 
   if (isLoading) {
@@ -165,6 +197,64 @@ export const AdminDashboard = () => {
           </div>
         </div>
 
+        {/* Admin Registration Form */}
+        <div className="mb-12 flex flex-col">
+          <Card className="w-full max-w-md border border-gray-200 bg-white text-black shadow-none">
+            <CardHeader className="pb-2 flex flex-col items-center">
+              <CardTitle className="text-xl font-semibold text-black flex items-center gap-2">
+                <Shield className="w-5 h-5 text-black" />
+                Register New Admin
+              </CardTitle>
+              <div className="text-sm text-gray-500 font-normal mt-1">Create a new admin account to share credentials securely.</div>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <form onSubmit={handleAdminRegister} className="flex flex-col gap-4">
+                <div className="flex flex-col gap-1">
+                  <Label htmlFor="admin-username" className="text-black">Username</Label>
+                  <Input
+                    id="admin-username"
+                    type="text"
+                    value={newAdminUsername}
+                    onChange={e => setNewAdminUsername(e.target.value)}
+                    placeholder="Enter new admin username"
+                    autoComplete="off"
+                    disabled={isRegistering}
+                    className="bg-white border border-gray-300 text-black placeholder-gray-400 focus:border-black focus:ring-0"
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <Label htmlFor="admin-password" className="text-black">Password</Label>
+                  <Input
+                    id="admin-password"
+                    type="password"
+                    value={newAdminPassword}
+                    onChange={e => setNewAdminPassword(e.target.value)}
+                    placeholder="Enter new admin password"
+                    autoComplete="new-password"
+                    disabled={isRegistering}
+                    className="bg-white border border-gray-300 text-black placeholder-gray-400 focus:border-black focus:ring-0"
+                  />
+                </div>
+                <Button type="submit" disabled={isRegistering} className="w-full bg-black text-white hover:bg-gray-900">
+                  {isRegistering ? "Registering..." : "Register Admin"}
+                </Button>
+                {registerSuccess && (
+                  <div className="mt-2 p-3 bg-gray-50 border border-gray-200 rounded text-black text-sm">
+                    <div className="font-semibold mb-1">Admin registered!</div>
+                    <div>
+                      <span className="font-medium">Username:</span> {registerSuccess.username}
+                    </div>
+                    <div>
+                      <span className="font-medium">Password:</span> {registerSuccess.password}
+                    </div>
+                    <div className="mt-2 text-xs text-gray-500">Share these credentials securely with the new admin.</div>
+                  </div>
+                )}
+              </form>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Pending Reviews */}
         <div className="mb-12">
           <div className="flex items-center space-x-3 mb-6">
@@ -175,89 +265,38 @@ export const AdminDashboard = () => {
           </div>
           
           {pendingPosts.length > 0 ? (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {pendingPosts.map((post) => {
-                const companyDisplay = post.post_body.companyName || post.post_body.company || "Unknown Company";
-                return (
-                  <Card key={post.id} className="bg-white shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-                    <CardHeader className="pb-4">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <CardTitle className="text-lg text-gray-900 mb-1">{companyDisplay}</CardTitle>
-                          <p className="text-sm text-gray-600">{post.post_body.role}</p>
-                          <p className="text-xs text-gray-500 mt-1">by {post.user_id}</p>
-                        </div>
-                        <div className="flex items-center space-x-1 px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">
-                          <Clock className="w-3 h-3" />
-                          <span>Pending</span>
-                        </div>
-                      </div>
-                    </CardHeader>
-                    
-                    <CardContent className="pt-0">
-                      <div className="space-y-3 mb-4">
-                        {post.post_body.ctc && (
-                          <div className="flex justify-between text-sm">
-                            <span className="text-gray-600">CTC:</span>
-                            <span className="font-medium">{post.post_body.ctc} LPA</span>
-                          </div>
-                        )}
-                        {post.post_body.cgpa && (
-                          <div className="flex justify-between text-sm">
-                            <span className="text-gray-600">CGPA:</span>
-                            <span className="font-medium">{post.post_body.cgpa}</span>
-                          </div>
-                        )}
-                        {post.post_body.rounds && (
-                          <div className="flex justify-between text-sm">
-                            <span className="text-gray-600">Rounds:</span>
-                            <span className="font-medium">{post.post_body.rounds}</span>
-                          </div>
-                        )}
-                      </div>
-                      
-                      {post.post_body.experience && (
-                        <div className="mb-4">
-                          <p className="text-xs font-medium text-gray-700 mb-2">Experience Preview:</p>
-                          <div 
-                            className="text-xs text-gray-600 line-clamp-3 bg-gray-50 p-3 rounded"
-                            dangerouslySetInnerHTML={{ 
-                              __html: post.post_body.experience.substring(0, 150) + '...' 
-                            }}
-                          />
-                        </div>
-                      )}
-                      
-                      <div className="flex gap-2">
-                        <Button
-                          size="sm"
-                          onClick={() => handleReview(post.id, 'approve')}
-                          className="flex-1 bg-green-600 hover:bg-green-700 text-white"
-                        >
-                          <CheckCircle className="w-4 h-4 mr-1" />
-                          Approve
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="destructive"
-                          onClick={() => handleReview(post.id, 'reject')}
-                          className="flex-1"
-                        >
-                          <XCircle className="w-4 h-4 mr-1" />
-                          Reject
-                        </Button>
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleDelete(post.id)}
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
+            <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-1">
+              {pendingPosts.map((post) => (
+                <div key={post.id} className="w-full">
+                  <PostCard post={post} />
+                  <div className="flex gap-2 mt-4">
+                    <Button
+                      size="sm"
+                      onClick={() => handleReview(post.id, 'approve')}
+                      className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                    >
+                      <CheckCircle className="w-4 h-4 mr-1" />
+                      Approve
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="destructive"
+                      onClick={() => handleReview(post.id, 'reject')}
+                      className="flex-1"
+                    >
+                      <XCircle className="w-4 h-4 mr-1" />
+                      Reject
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => handleDelete(post.id)}
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                </div>
+              ))}
             </div>
           ) : (
             <div className="text-center py-12 bg-white rounded-xl border border-gray-200">

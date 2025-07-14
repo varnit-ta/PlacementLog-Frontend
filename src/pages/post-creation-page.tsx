@@ -10,6 +10,8 @@ import { apiService } from '@/lib/api';
 import { useNavigate } from 'react-router-dom';
 import { Building2, Briefcase, DollarSign, GraduationCap, Clock, FileText, ArrowLeft } from 'lucide-react';
 import { toast } from 'sonner';
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
+import { Label as ShadLabel } from '@/components/ui/label';
 
 export const PostCreationForm = () => {
   const [companyName, setCompanyName] = useState('');
@@ -18,7 +20,9 @@ export const PostCreationForm = () => {
   const [cgpa, setCgpa] = useState('');
   const [rounds, setRounds] = useState('');
   const [experience, setExperience] = useState('');
+  const [status, setStatus] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isAnonymous, setIsAnonymous] = useState(false);
 
   const userContext = useContext(UserContext);
   const currentUser = userContext?.state;
@@ -51,12 +55,14 @@ export const PostCreationForm = () => {
       const postBody: any = {
         companyName,
         role,
+        status, // Add status to post body
       };
 
       if (ctc) postBody.ctc = ctc;
       if (cgpa) postBody.cgpa = cgpa;
       if (rounds) postBody.rounds = parseInt(rounds);
       if (experience) postBody.experience = experience;
+      if (!isAnonymous && currentUser?.username) postBody.username = currentUser.username;
 
       await apiService.createPost(postBody);
       
@@ -67,6 +73,8 @@ export const PostCreationForm = () => {
       setCgpa('');
       setRounds('');
       setExperience('');
+      setStatus(''); // Reset status
+      setIsAnonymous(false); // Reset anonymous toggle
       
       toast.success('Post created successfully! It will be reviewed by an admin.');
       navigate('/');
@@ -104,9 +112,10 @@ export const PostCreationForm = () => {
 
         {/* Form */}
         <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-            {/* Company Information */}
-            <div className="space-y-4">
+          {/* Section 1: Company & Role */}
+          <div className="mb-8">
+            <h2 className="text-lg font-semibold text-black mb-4">Company & Role</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <Label htmlFor="company" className="flex items-center space-x-2 text-sm font-medium text-gray-700">
                   <Building2 className="w-4 h-4" />
@@ -120,7 +129,6 @@ export const PostCreationForm = () => {
                   className="mt-1"
                 />
               </div>
-
               <div>
                 <Label htmlFor="role" className="flex items-center space-x-2 text-sm font-medium text-gray-700">
                   <Briefcase className="w-4 h-4" />
@@ -135,9 +143,14 @@ export const PostCreationForm = () => {
                 />
               </div>
             </div>
+          </div>
 
-            {/* Additional Details */}
-            <div className="space-y-4">
+          <hr className="my-8 border-gray-200" />
+
+          {/* Section 2: Details */}
+          <div className="mb-8">
+            <h2 className="text-lg font-semibold text-black mb-4">Details</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <Label htmlFor="ctc" className="flex items-center space-x-2 text-sm font-medium text-gray-700">
                   <DollarSign className="w-4 h-4" />
@@ -152,7 +165,6 @@ export const PostCreationForm = () => {
                   className="mt-1"
                 />
               </div>
-
               <div>
                 <Label htmlFor="cgpa" className="flex items-center space-x-2 text-sm font-medium text-gray-700">
                   <GraduationCap className="w-4 h-4" />
@@ -168,7 +180,6 @@ export const PostCreationForm = () => {
                   className="mt-1"
                 />
               </div>
-
               <div>
                 <Label htmlFor="rounds" className="flex items-center space-x-2 text-sm font-medium text-gray-700">
                   <Clock className="w-4 h-4" />
@@ -183,14 +194,30 @@ export const PostCreationForm = () => {
                   className="mt-1"
                 />
               </div>
+              <div>
+                <Label htmlFor="status" className="flex items-center space-x-2 text-sm font-medium text-gray-700">
+                  <Clock className="w-4 h-4" />
+                  <span>Status</span>
+                </Label>
+                <Select value={status} onValueChange={setStatus}>
+                  <SelectTrigger id="status" className="w-full mt-1">
+                    <SelectValue placeholder="Select status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="accepted">Accepted</SelectItem>
+                    <SelectItem value="rejected">Rejected</SelectItem>
+                    <SelectItem value="pending">Pending</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
           </div>
 
-          {/* Experience Editor */}
+          <hr className="my-8 border-gray-200" />
+
+          {/* Section 3: Experience */}
           <div className="mb-8">
-            <Label className="text-sm font-medium text-gray-700 mb-2 block">
-              Experience & Interview Process
-            </Label>
+            <h2 className="text-lg font-semibold text-black mb-4">Experience & Interview Process</h2>
             <div className="border border-gray-200 rounded-lg">
               <Editor
                 onContentChange={setExperience}
@@ -198,7 +225,21 @@ export const PostCreationForm = () => {
             </div>
           </div>
 
-          {/* Submit Button */}
+          {/* Section 4: Anonymous Toggle */}
+          <div className="flex items-center mb-8">
+            <input
+              id="anonymous-toggle"
+              type="checkbox"
+              checked={isAnonymous}
+              onChange={e => setIsAnonymous(e.target.checked)}
+              className="mr-2 h-4 w-4 accent-black"
+            />
+            <ShadLabel htmlFor="anonymous-toggle" className="text-sm text-gray-700 select-none cursor-pointer">
+              Post as anonymous
+            </ShadLabel>
+          </div>
+
+          {/* Section 5: Submit Button */}
           <div className="flex justify-end">
             <Button
               onClick={handleSubmit}

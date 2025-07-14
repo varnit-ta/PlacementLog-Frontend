@@ -28,9 +28,11 @@ interface PostCardProps {
       rounds?: any;
       experience?: string;
       user?: string;
+      status?: string; // Added status to post_body
       [key: string]: any;
     };
     reviewed?: boolean;
+    username?: string; // Added username to post
   };
 }
 
@@ -74,7 +76,6 @@ export const PostCard = ({ post }: PostCardProps) => {
               </div>
             </div>
           </div>
-          
           {/* Status Badge */}
           <div className="flex items-center space-x-2">
             {post.reviewed === false ? (
@@ -90,7 +91,6 @@ export const PostCard = ({ post }: PostCardProps) => {
             )}
           </div>
         </div>
-
         {/* User Info */}
         <div className="flex items-center space-x-2 mb-4">
           <div className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center">
@@ -107,14 +107,12 @@ export const PostCard = ({ post }: PostCardProps) => {
               <p className="text-lg font-semibold text-gray-900">{ctc} LPA</p>
             </div>
           )}
-          
           {cgpa && (
             <div className="bg-gray-50 rounded-lg p-3">
               <p className="text-xs font-medium text-gray-700 uppercase tracking-wide">CGPA</p>
               <p className="text-lg font-semibold text-gray-900">{cgpa}</p>
             </div>
           )}
-          
           {rounds && (
             <div className="bg-gray-50 rounded-lg p-3">
               <p className="text-xs font-medium text-gray-700 uppercase tracking-wide">Rounds</p>
@@ -122,7 +120,6 @@ export const PostCard = ({ post }: PostCardProps) => {
             </div>
           )}
         </div>
-
         {/* Experience Section */}
         {decodedExperience && (
           <Accordion type="single" collapsible className="w-full">

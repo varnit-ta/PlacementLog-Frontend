@@ -108,16 +108,13 @@ interface EditorProps {
 const Editor: React.FC<EditorProps> = ({ onContentChange }) => {
   const [content, setContent] = useState('');
 
-  const handleChange = useCallback(
-    debounce((value: string) => {
-      setContent(value);
-      onContentChange?.(value);
-    }, 500),
-    []
-  );
+  const handleChange = useCallback((value: string) => {
+    setContent(value);
+    onContentChange?.(value);
+  }, []);
 
   return (
-    <div className="max-w-3xl mx-auto">
+    <div>
       <RichTextEditor
         dark={false}
         output="html"
