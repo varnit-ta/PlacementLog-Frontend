@@ -9,8 +9,11 @@ import {
   Shield, 
   LogIn, 
   LogOut, 
-  User
+  User,
+  Menu
 } from "lucide-react"
+import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet"
+import { Button } from "@/components/ui/button"
 
 export function Navbar() {
   const userContext = useContext(UserContext)
@@ -48,7 +51,58 @@ export function Navbar() {
             </Link>
           </div>
 
-          {/* Navigation Links */}
+          {/* Mobile Nav: Hamburger + Drawer */}
+          <div className="flex md:hidden items-center">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon" className="mr-2">
+                  <Menu className="w-6 h-6" />
+                  <span className="sr-only">Open navigation menu</span>
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="left" className="p-0 w-64">
+                <nav className="flex flex-col gap-1 p-4">
+                  <Link
+                    to="/"
+                    className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                      isActive("/")
+                        ? "bg-gray-100 text-gray-900"
+                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                    }`}
+                  >
+                    <Home className="w-4 h-4" />
+                    <span>Dashboard</span>
+                  </Link>
+                  <Link
+                    to="/create"
+                    className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                      isActive("/create")
+                        ? "bg-gray-100 text-gray-900"
+                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                    }`}
+                  >
+                    <Plus className="w-4 h-4" />
+                    <span>Create Post</span>
+                  </Link>
+                  {isAdmin && (
+                    <Link
+                      to="/admin"
+                      className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                        isActive("/admin")
+                          ? "bg-gray-100 text-gray-900"
+                          : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                      }`}
+                    >
+                      <Shield className="w-4 h-4" />
+                      <span>Admin</span>
+                    </Link>
+                  )}
+                </nav>
+              </SheetContent>
+            </Sheet>
+          </div>
+
+          {/* Navigation Links (Desktop) */}
           <div className="hidden md:flex items-center space-x-8">
             <Link
               to="/"
