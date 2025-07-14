@@ -144,8 +144,10 @@ export const AdminDashboard = () => {
     );
   }
 
-  const pendingPosts = posts.filter(post => post.reviewed === false);
-  const approvedPosts = posts.filter(post => post.reviewed === true);
+  // Ensure posts is always an array
+  const safePosts = Array.isArray(posts) ? posts : [];
+  const pendingPosts = safePosts.filter(post => post.reviewed === false);
+  const approvedPosts = safePosts.filter(post => post.reviewed === true);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-8">
@@ -168,7 +170,7 @@ export const AdminDashboard = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-gray-600">Total Posts</p>
-                  <p className="text-2xl font-bold text-gray-900">{posts.length}</p>
+                  <p className="text-2xl font-bold text-gray-900">{safePosts.length}</p>
                 </div>
                 <TrendingUp className="w-8 h-8 text-blue-600" />
               </div>
