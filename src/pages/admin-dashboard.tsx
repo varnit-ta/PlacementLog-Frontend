@@ -9,6 +9,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import "@/styles/tiptap.css";
 import { PostCard } from "@/components/postcard";
+import { Skeleton } from "@/components/ui/skeleton";
+import { FixedSizeList as List } from "react-window";
 
 export const AdminDashboard = () => {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -115,11 +117,23 @@ export const AdminDashboard = () => {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-center py-16">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p className="text-lg text-gray-600">Loading admin dashboard...</p>
-            </div>
+          <div className="flex flex-col gap-8 py-16">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center space-x-4 mb-4">
+                  <Skeleton className="w-10 h-10" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-1/3" />
+                    <Skeleton className="h-3 w-1/4" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <Skeleton className="h-6 w-full" />
+                  <Skeleton className="h-6 w-full" />
+                </div>
+                <Skeleton className="h-24 w-full" />
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -266,39 +280,83 @@ export const AdminDashboard = () => {
           </div>
           
           {pendingPosts.length > 0 ? (
-            <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-1">
-              {pendingPosts.map((post) => (
-                <div key={post.id} className="w-full">
-                  <PostCard post={post} />
-                  <div className="flex gap-2 mt-4">
-                    <Button
-                      size="sm"
-                      onClick={() => handleReview(post.id, 'approve')}
-                      className="flex-1 bg-green-600 hover:bg-green-700 text-white"
-                    >
-                      <CheckCircle className="w-4 h-4 mr-1" />
-                      Approve
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="destructive"
-                      onClick={() => handleReview(post.id, 'reject')}
-                      className="flex-1"
-                    >
-                      <XCircle className="w-4 h-4 mr-1" />
-                      Reject
-                    </Button>
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleDelete(post.id)}
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
+            pendingPosts.length > 20 ? (
+              <List
+                height={800}
+                itemCount={pendingPosts.length}
+                itemSize={340}
+                width={"100%"}
+                className="flex flex-col gap-8"
+              >
+                {({ index, style }: { index: number; style: React.CSSProperties }) => (
+                  <div style={style} key={pendingPosts[index].id}>
+                    <div className="w-full">
+                      <PostCard post={pendingPosts[index]} />
+                      <div className="flex gap-2 mt-4">
+                        <Button
+                          size="sm"
+                          onClick={() => handleReview(pendingPosts[index].id, 'approve')}
+                          className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                        >
+                          <CheckCircle className="w-4 h-4 mr-1" />
+                          Approve
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          onClick={() => handleReview(pendingPosts[index].id, 'reject')}
+                          className="flex-1"
+                        >
+                          <XCircle className="w-4 h-4 mr-1" />
+                          Reject
+                        </Button>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleDelete(pendingPosts[index].id)}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                )}
+              </List>
+            ) : (
+              <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-1">
+                {pendingPosts.map((post) => (
+                  <div key={post.id} className="w-full">
+                    <PostCard post={post} />
+                    <div className="flex gap-2 mt-4">
+                      <Button
+                        size="sm"
+                        onClick={() => handleReview(post.id, 'approve')}
+                        className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+                      >
+                        <CheckCircle className="w-4 h-4 mr-1" />
+                        Approve
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => handleReview(post.id, 'reject')}
+                        className="flex-1"
+                      >
+                        <XCircle className="w-4 h-4 mr-1" />
+                        Reject
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleDelete(post.id)}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )
           ) : (
             <div className="text-center py-12 bg-white rounded-xl border border-gray-200">
               <CheckCircle className="w-12 h-12 text-green-600 mx-auto mb-4" />
@@ -318,62 +376,126 @@ export const AdminDashboard = () => {
           </div>
           
           {approvedPosts.length > 0 ? (
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {approvedPosts.map((post) => {
-                const companyDisplay = post.post_body.companyName || post.post_body.company || "Unknown Company";
-                return (
-                  <Card key={post.id} className="bg-white shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-                    <CardHeader className="pb-4">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <CardTitle className="text-lg text-gray-900 mb-1">{companyDisplay}</CardTitle>
-                          <p className="text-sm text-gray-600">{post.post_body.role}</p>
-                          <p className="text-xs text-gray-500 mt-1">by {post.user_id}</p>
+            approvedPosts.length > 20 ? (
+              <List
+                height={800}
+                itemCount={approvedPosts.length}
+                itemSize={340}
+                width={"100%"}
+                className="flex flex-col gap-8"
+              >
+                {({ index, style }: { index: number; style: React.CSSProperties }) => {
+                  const post = approvedPosts[index];
+                  const companyDisplay = post.post_body.companyName || post.post_body.company || "Unknown Company";
+                  return (
+                    <div style={style} key={post.id}>
+                      <Card className="bg-white shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+                        <CardHeader className="pb-4">
+                          <div className="flex items-start justify-between">
+                            <div className="flex-1">
+                              <CardTitle className="text-lg text-gray-900 mb-1">{companyDisplay}</CardTitle>
+                              <p className="text-sm text-gray-600">{post.post_body.role}</p>
+                              <p className="text-xs text-gray-500 mt-1">by {post.user_id}</p>
+                            </div>
+                            <div className="flex items-center space-x-1 px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+                              <CheckCircle className="w-3 h-3" />
+                              <span>Approved</span>
+                            </div>
+                          </div>
+                        </CardHeader>
+                        <CardContent className="pt-0">
+                          <div className="space-y-3 mb-4">
+                            {post.post_body.ctc && (
+                              <div className="flex justify-between text-sm">
+                                <span className="text-gray-600">CTC:</span>
+                                <span className="font-medium">{post.post_body.ctc} LPA</span>
+                              </div>
+                            )}
+                            {post.post_body.cgpa && (
+                              <div className="flex justify-between text-sm">
+                                <span className="text-gray-600">CGPA:</span>
+                                <span className="font-medium">{post.post_body.cgpa}</span>
+                              </div>
+                            )}
+                            {post.post_body.rounds && (
+                              <div className="flex justify-between text-sm">
+                                <span className="text-gray-600">Rounds:</span>
+                                <span className="font-medium">{post.post_body.rounds}</span>
+                              </div>
+                            )}
+                          </div>
+                          <div className="flex justify-end">
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => handleDelete(post.id)}
+                            >
+                              <Trash2 className="w-4 h-4 mr-1" />
+                              Delete
+                            </Button>
+                          </div>
+                        </CardContent>
+                      </Card>
+                    </div>
+                  );
+                }}
+              </List>
+            ) : (
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {approvedPosts.map((post) => {
+                  const companyDisplay = post.post_body.companyName || post.post_body.company || "Unknown Company";
+                  return (
+                    <Card key={post.id} className="bg-white shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+                      <CardHeader className="pb-4">
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1">
+                            <CardTitle className="text-lg text-gray-900 mb-1">{companyDisplay}</CardTitle>
+                            <p className="text-sm text-gray-600">{post.post_body.role}</p>
+                            <p className="text-xs text-gray-500 mt-1">by {post.user_id}</p>
+                          </div>
+                          <div className="flex items-center space-x-1 px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+                            <CheckCircle className="w-3 h-3" />
+                            <span>Approved</span>
+                          </div>
                         </div>
-                        <div className="flex items-center space-x-1 px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
-                          <CheckCircle className="w-3 h-3" />
-                          <span>Approved</span>
+                      </CardHeader>
+                      <CardContent className="pt-0">
+                        <div className="space-y-3 mb-4">
+                          {post.post_body.ctc && (
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-600">CTC:</span>
+                              <span className="font-medium">{post.post_body.ctc} LPA</span>
+                            </div>
+                          )}
+                          {post.post_body.cgpa && (
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-600">CGPA:</span>
+                              <span className="font-medium">{post.post_body.cgpa}</span>
+                            </div>
+                          )}
+                          {post.post_body.rounds && (
+                            <div className="flex justify-between text-sm">
+                              <span className="text-gray-600">Rounds:</span>
+                              <span className="font-medium">{post.post_body.rounds}</span>
+                            </div>
+                          )}
                         </div>
-                      </div>
-                    </CardHeader>
-                    
-                    <CardContent className="pt-0">
-                      <div className="space-y-3 mb-4">
-                        {post.post_body.ctc && (
-                          <div className="flex justify-between text-sm">
-                            <span className="text-gray-600">CTC:</span>
-                            <span className="font-medium">{post.post_body.ctc} LPA</span>
-                          </div>
-                        )}
-                        {post.post_body.cgpa && (
-                          <div className="flex justify-between text-sm">
-                            <span className="text-gray-600">CGPA:</span>
-                            <span className="font-medium">{post.post_body.cgpa}</span>
-                          </div>
-                        )}
-                        {post.post_body.rounds && (
-                          <div className="flex justify-between text-sm">
-                            <span className="text-gray-600">Rounds:</span>
-                            <span className="font-medium">{post.post_body.rounds}</span>
-                          </div>
-                        )}
-                      </div>
-                      
-                      <div className="flex justify-end">
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleDelete(post.id)}
-                        >
-                          <Trash2 className="w-4 h-4 mr-1" />
-                          Delete
-                        </Button>
-                      </div>
-                    </CardContent>
-                  </Card>
-                );
-              })}
-            </div>
+                        <div className="flex justify-end">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleDelete(post.id)}
+                          >
+                            <Trash2 className="w-4 h-4 mr-1" />
+                            Delete
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
+              </div>
+            )
           ) : (
             <div className="text-center py-12 bg-white rounded-xl border border-gray-200">
               <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">

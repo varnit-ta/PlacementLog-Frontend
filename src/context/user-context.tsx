@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useReducer } from "react";
+import React, { createContext, useEffect, useReducer, useMemo } from "react";
 
 type UserType = {
 	userId: string;
@@ -56,8 +56,9 @@ export const UserContextProvider = ({
 		}
 	}, []);
 
+	const value = useMemo(() => ({ state, dispatch }), [state, dispatch]);
 	return (
-		<UserContext.Provider value={{ state, dispatch }}>
+		<UserContext.Provider value={value}>
 			{children}
 		</UserContext.Provider>
 	);

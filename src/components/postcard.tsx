@@ -14,6 +14,7 @@ import "katex/dist/katex.min.css";
 import "easydrawer/styles.css";
 import "@excalidraw/excalidraw/index.css";
 import { Building2, User, Clock, CheckCircle, AlertCircle } from "lucide-react";
+import React from "react";
 
 interface PostCardProps {
   post: {
@@ -36,7 +37,7 @@ interface PostCardProps {
   };
 }
 
-export const PostCard = ({ post }: PostCardProps) => {
+export const PostCard = React.memo(({ post }: PostCardProps) => {
   const {
     companyName,
     company,
@@ -145,4 +146,4 @@ export const PostCard = ({ post }: PostCardProps) => {
       </div>
     </div>
   );
-};
+});

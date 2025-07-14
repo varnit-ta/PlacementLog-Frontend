@@ -1,4 +1,4 @@
-import React, { createContext, useReducer } from "react";
+import React, { createContext, useReducer, useMemo } from "react";
 
 export type PostBody = {
   companyName?: string;
@@ -48,9 +48,10 @@ export const PostsContext = createContext<PostsContextType | undefined>(undefine
 
 export const PostsContextProvider = ({ children }: { children: React.ReactNode }) => {
   const [state, dispatch] = useReducer(PostReducer, []);
+  const value = useMemo(() => ({ state, dispatch }), [state, dispatch]);
 
   return (
-    <PostsContext.Provider value={{ state, dispatch }}>
+    <PostsContext.Provider value={value}>
       {children}
     </PostsContext.Provider>
   );

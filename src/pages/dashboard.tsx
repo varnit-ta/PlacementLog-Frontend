@@ -4,6 +4,8 @@ import { PostCard } from "@/components/postcard";
 import { apiService } from "@/lib/api";
 import { Search, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
+import { Skeleton } from "@/components/ui/skeleton";
+import { FixedSizeList as List } from "react-window";
 
 export const Dashboard = () => {
   const postContext = useContext(PostsContext);
@@ -60,11 +62,23 @@ export const Dashboard = () => {
     return (
       <div className="min-h-screen bg-white py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-center py-16">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
-              <p className="text-lg text-gray-600">Loading placement posts...</p>
-            </div>
+          <div className="flex flex-col gap-8 py-16">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div className="flex items-center space-x-4 mb-4">
+                  <Skeleton className="w-10 h-10" />
+                  <div className="flex-1 space-y-2">
+                    <Skeleton className="h-4 w-1/3" />
+                    <Skeleton className="h-3 w-1/4" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <Skeleton className="h-6 w-full" />
+                  <Skeleton className="h-6 w-full" />
+                </div>
+                <Skeleton className="h-24 w-full" />
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -130,13 +144,29 @@ export const Dashboard = () => {
 
         {/* Posts List - one per row */}
         {filteredPosts.length > 0 ? (
-          <div className="flex flex-col gap-8">
-            {filteredPosts.map((post: any, idx: number) => (
-              <div key={post.id ?? idx}>
-                <PostCard post={post} />
-              </div>
-            ))}
-          </div>
+          filteredPosts.length > 20 ? (
+            <List
+              height={800}
+              itemCount={filteredPosts.length}
+              itemSize={320}
+              width={"100%"}
+              className="flex flex-col gap-8"
+            >
+              {({ index, style }: { index: number; style: React.CSSProperties }) => (
+                <div style={style} key={filteredPosts[index].id ?? index}>
+                  <PostCard post={filteredPosts[index]} />
+                </div>
+              )}
+            </List>
+          ) : (
+            <div className="flex flex-col gap-8">
+              {filteredPosts.map((post: any, idx: number) => (
+                <div key={post.id ?? idx}>
+                  <PostCard post={post} />
+                </div>
+              ))}
+            </div>
+          )
         ) : (
           <div className="text-center py-16">
             <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
