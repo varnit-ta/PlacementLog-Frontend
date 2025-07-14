@@ -4,6 +4,7 @@ import { apiService, type Post } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { CheckCircle, XCircle, Trash2, Shield, Clock, CheckSquare, AlertTriangle, TrendingUp } from "lucide-react";
+import { toast } from "sonner";
 
 export const AdminDashboard = () => {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -39,24 +40,44 @@ export const AdminDashboard = () => {
     try {
       await apiService.reviewPost(postId, action);
       await fetchPosts();
-      alert(`Post ${action}d successfully`);
+      toast.success(`Post ${action}d successfully`);
     } catch (err: any) {
       console.error(`Error ${action}ing post:`, err);
-      alert(err.message || `Failed to ${action} post`);
+      toast.error(err.message || `Failed to ${action} post`);
     }
   };
 
   const handleDelete = async (postId: string) => {
-    if (!confirm("Are you sure you want to delete this post?")) return;
-
-    try {
-      await apiService.deletePostAsAdmin(postId);
-      await fetchPosts();
-      alert("Post deleted successfully");
-    } catch (err: any) {
-      console.error("Error deleting post:", err);
-      alert(err.message || "Failed to delete post");
-    }
+    // Use a custom confirm dialog or toast for confirmation
+    toast.custom((t) => (
+      <div>
+        <div className="mb-2">Are you sure you want to delete this post?</div>
+        <div className="flex gap-2">
+          <button
+            className="px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700"
+            onClick={async () => {
+              toast.dismiss(t);
+              try {
+                await apiService.deletePostAsAdmin(postId);
+                await fetchPosts();
+                toast.success("Post deleted successfully");
+              } catch (err: any) {
+                console.error("Error deleting post:", err);
+                toast.error(err.message || "Failed to delete post");
+              }
+            }}
+          >
+            Delete
+          </button>
+          <button
+            className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
+            onClick={() => toast.dismiss(t)}
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+    ), { duration: 10000 });
   };
 
   if (isLoading) {
