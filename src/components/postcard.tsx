@@ -35,9 +35,10 @@ interface PostCardProps {
     reviewed?: boolean;
     username?: string; // Added username to post
   };
+  hideStatusBadge?: boolean;
 }
 
-export const PostCard = React.memo(({ post }: PostCardProps) => {
+export const PostCard = React.memo(({ post, hideStatusBadge = false }: PostCardProps) => {
   const {
     companyName,
     company,
@@ -78,40 +79,42 @@ export const PostCard = React.memo(({ post }: PostCardProps) => {
             </div>
           </div>
           {/* Status Badge */}
-          <div className="flex items-center space-x-2">
-            {post.post_body?.status ? (
-              post.post_body.status === 'accepted' ? (
-                <div className="flex items-center space-x-1 px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
-                  <CheckCircle className="w-3 h-3" />
-                  <span>Accepted</span>
-                </div>
-              ) : post.post_body.status === 'rejected' || post.post_body.status === 'failed' ? (
-                <div className="flex items-center space-x-1 px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">
-                  <AlertCircle className="w-3 h-3" />
-                  <span>{post.post_body.status.charAt(0).toUpperCase() + post.post_body.status.slice(1)}</span>
-                </div>
-              ) : post.post_body.status === 'pending' ? (
+          {!hideStatusBadge && (
+            <div className="flex items-center space-x-2">
+              {post.post_body?.status ? (
+                post.post_body.status === 'accepted' ? (
+                  <div className="flex items-center space-x-1 px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+                    <CheckCircle className="w-3 h-3" />
+                    <span>Accepted</span>
+                  </div>
+                ) : post.post_body.status === 'rejected' || post.post_body.status === 'failed' ? (
+                  <div className="flex items-center space-x-1 px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">
+                    <AlertCircle className="w-3 h-3" />
+                    <span>{post.post_body.status.charAt(0).toUpperCase() + post.post_body.status.slice(1)}</span>
+                  </div>
+                ) : post.post_body.status === 'pending' ? (
+                  <div className="flex items-center space-x-1 px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">
+                    <AlertCircle className="w-3 h-3" />
+                    <span>Pending</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center space-x-1 px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs font-medium">
+                    <span>{post.post_body.status.charAt(0).toUpperCase() + post.post_body.status.slice(1)}</span>
+                  </div>
+                )
+              ) : post.reviewed === false ? (
                 <div className="flex items-center space-x-1 px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">
                   <AlertCircle className="w-3 h-3" />
                   <span>Pending</span>
                 </div>
               ) : (
-                <div className="flex items-center space-x-1 px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs font-medium">
-                  <span>{post.post_body.status.charAt(0).toUpperCase() + post.post_body.status.slice(1)}</span>
+                <div className="flex items-center space-x-1 px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+                  <CheckCircle className="w-3 h-3" />
+                  <span>Approved</span>
                 </div>
-              )
-            ) : post.reviewed === false ? (
-              <div className="flex items-center space-x-1 px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">
-                <AlertCircle className="w-3 h-3" />
-                <span>Pending</span>
-              </div>
-            ) : (
-              <div className="flex items-center space-x-1 px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
-                <CheckCircle className="w-3 h-3" />
-                <span>Approved</span>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
+          )}
         </div>
         {/* User Info */}
         <div className="flex items-center space-x-2 mb-4">

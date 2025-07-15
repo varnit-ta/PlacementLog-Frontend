@@ -95,15 +95,22 @@ const extensions = [
 
 interface EditorProps {
   onContentChange: (content: string) => void;
+  value?: string;
 }
 
-const Editor: React.FC<EditorProps> = ({ onContentChange }) => {
-  const [content, setContent] = useState('');
+const Editor: React.FC<EditorProps> = ({ onContentChange, value }) => {
+  const [content, setContent] = useState(value || '');
+
+  React.useEffect(() => {
+    if (value !== undefined && value !== content) {
+      setContent(value);
+    }
+  }, [value]);
 
   const handleChange = useCallback((value: string) => {
     setContent(value);
     onContentChange?.(value);
-  }, []);
+  }, [onContentChange]);
 
   return (
     <div>

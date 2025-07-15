@@ -1,4 +1,4 @@
-import React, { createContext, useEffect, useReducer, useMemo } from "react";
+import React, { createContext, useEffect, useReducer, useMemo, useState } from "react";
 
 type UserType = {
 	userId: string;
@@ -12,6 +12,7 @@ type ActionType = { type: "LOGIN"; payload: UserType } | { type: "LOGOUT" };
 interface UserContextType {
 	state: UserType;
 	dispatch: React.Dispatch<ActionType>;
+	loading: boolean;
 }
 
 const UserReducer = (state: UserType, action: ActionType): UserType => {
@@ -35,6 +36,7 @@ export const UserContextProvider = ({
 	children: React.ReactNode;
 }) => {
 	const [state, dispatch] = useReducer(UserReducer, null);
+	const [loading, setLoading] = useState(true);
 
 	useEffect(() => {
 		const storedUser = localStorage.getItem("user");
@@ -56,9 +58,10 @@ export const UserContextProvider = ({
 				localStorage.removeItem("user");
 			}
 		}
+		setLoading(false);
 	}, []);
 
-	const value = useMemo(() => ({ state, dispatch }), [state, dispatch]);
+	const value = useMemo(() => ({ state, dispatch, loading }), [state, dispatch, loading]);
 	return (
 		<UserContext.Provider value={value}>
 			{children}

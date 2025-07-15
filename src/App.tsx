@@ -8,10 +8,16 @@ import { useContext } from "react";
 import { UserContext } from "./context/user-context";
 import { AuthPage } from "./pages/auth-page";
 import { Toaster } from "./components/ui/sonner";
+import MyPosts from "./components/MyPosts";
 
 export default function App() {
 	const userContext = useContext(UserContext);
 	const user = userContext?.state;
+	const loading = userContext?.loading;
+
+	if (loading) {
+		return <div className="min-h-screen flex items-center justify-center text-gray-600 text-lg">Loading...</div>;
+	}
 	// user now has userId, username, regno, token
 
 	return (
@@ -32,6 +38,10 @@ export default function App() {
 						/>
 						<Route path="/auth" element={<AuthPage />} />
 						<Route path="/admin-auth" element={<AdminAuthPage />} />
+						<Route
+							path="/my-posts"
+							element={user ? <MyPosts /> : <Navigate to="/auth" />}
+						/>
 					</Routes>
 				</main>
 

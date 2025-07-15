@@ -10,7 +10,8 @@ import {
   LogIn, 
   LogOut, 
   User,
-  Menu
+  Menu,
+  List
 } from "lucide-react"
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
@@ -74,17 +75,19 @@ export function Navbar() {
                     <Home className="w-4 h-4" />
                     <span>Dashboard</span>
                   </Link>
-                  <Link
-                    to="/create"
-                    className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                      isActive("/create")
-                        ? "bg-gray-100 text-gray-900"
-                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-                    }`}
-                  >
-                    <Plus className="w-4 h-4" />
-                    <span>Create Post</span>
-                  </Link>
+                  {!isAdmin && user && (
+                    <Link
+                      to="/create"
+                      className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                        isActive("/create")
+                          ? "bg-gray-100 text-gray-900"
+                          : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                      }`}
+                    >
+                      <Plus className="w-4 h-4" />
+                      <span>Create Post</span>
+                    </Link>
+                  )}
                   {isAdmin && (
                     <Link
                       to="/admin"
@@ -96,6 +99,19 @@ export function Navbar() {
                     >
                       <Shield className="w-4 h-4" />
                       <span>Admin</span>
+                    </Link>
+                  )}
+                  {!isAdmin && user && (
+                    <Link
+                      to="/my-posts"
+                      className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                        isActive("/my-posts")
+                          ? "bg-gray-100 text-gray-900"
+                          : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                      }`}
+                    >
+                      <List className="w-4 h-4" />
+                      <span>My Posts</span>
                     </Link>
                   )}
                 </nav>
@@ -117,17 +133,19 @@ export function Navbar() {
               <span>Dashboard</span>
             </Link>
 
-            <Link
-              to="/create"
-              className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                isActive("/create") 
-                  ? "bg-gray-100 text-gray-900" 
-                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
-              }`}
-            >
-              <Plus className="w-4 h-4" />
-              <span>Create Post</span>
-            </Link>
+            {!isAdmin && user && (
+              <Link
+                to="/create"
+                className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  isActive("/create") 
+                    ? "bg-gray-100 text-gray-900" 
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                }`}
+              >
+                <Plus className="w-4 h-4" />
+                <span>Create Post</span>
+              </Link>
+            )}
 
             {isAdmin && (
               <Link
@@ -140,6 +158,19 @@ export function Navbar() {
               >
                 <Shield className="w-4 h-4" />
                 <span>Admin</span>
+              </Link>
+            )}
+            {!isAdmin && user && (
+              <Link
+                to="/my-posts"
+                className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                  isActive("/my-posts") 
+                    ? "bg-gray-100 text-gray-900" 
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                }`}
+              >
+                <List className="w-4 h-4" />
+                <span>My Posts</span>
               </Link>
             )}
           </div>
