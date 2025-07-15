@@ -12,6 +12,7 @@ import { Toaster } from "./components/ui/sonner";
 export default function App() {
 	const userContext = useContext(UserContext);
 	const user = userContext?.state;
+	// user now has userId, username, regno, token
 
 	return (
 		<div className="min-h-screen bg-white">

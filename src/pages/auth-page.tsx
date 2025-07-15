@@ -14,37 +14,36 @@ export function AuthTab() {
   const navigate = useNavigate();
 
   const [regNo, setRegNo] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const resetForm = () => {
     setRegNo("");
+    setUsername("");
     setPassword("");
   };
 
+  // LOGIN: Only regno and password
   const handleLogin = async () => {
     if (!regNo || !password) {
       toast.error("Please fill in all fields");
       return;
     }
-
     setIsLoading(true);
     try {
-      const data = await apiService.login(regNo.toLowerCase(), password);
-      
-      // Store user data with userId (from userid field)
+      const loginPayload = { regno: regNo, password };
+      const data = await apiService.login(loginPayload);
       const userData = {
         userId: data.userid,
         username: data.username,
+        regno: data.regno,
         token: data.token
       };
-      
       dispatch({ type: "LOGIN", payload: userData });
       resetForm();
-
       localStorage.setItem("user", JSON.stringify(userData));
       toast.success("Login successful!");
-
       navigate("/");
     } catch (err: any) {
       console.error("Login error:", err);
@@ -54,29 +53,34 @@ export function AuthTab() {
     }
   };
 
+  // SIGNUP: Capitalize username before sending
+  function capitalizeName(name: string) {
+    return name
+      .split(' ')
+      .filter(Boolean)
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+  }
+
   const handleSignup = async () => {
-    if (!regNo || !password) {
+    if (!regNo || !username || !password) {
       toast.error("Please fill in all fields");
       return;
     }
-
     setIsLoading(true);
     try {
-      const data = await apiService.register(regNo.toLowerCase(), password);
-      
-      // Store user data with userId (from userid field)
+      const formattedUsername = capitalizeName(username);
+      const data = await apiService.register({ regno: regNo, username: formattedUsername, password });
       const userData = {
         userId: data.userid,
         username: data.username,
+        regno: data.regno,
         token: data.token
       };
-      
       dispatch({ type: "LOGIN", payload: userData });
       resetForm();
-
       localStorage.setItem("user", JSON.stringify(userData));
       toast.success("Account created successfully!");
-
       navigate("/");
     } catch (err: any) {
       console.error("Signup error:", err);
@@ -130,7 +134,6 @@ export function AuthTab() {
                     />
                   </div>
                 </div>
-                
                 <div>
                   <Label htmlFor="login-pass" className="text-sm font-medium text-gray-700">
                     Password
@@ -151,7 +154,6 @@ export function AuthTab() {
                   </div>
                 </div>
               </div>
-
               <Button 
                 className="w-full bg-black hover:bg-gray-800 text-white font-medium py-3"
                 onClick={handleLogin}
@@ -188,7 +190,24 @@ export function AuthTab() {
                     />
                   </div>
                 </div>
-                
+                <div>
+                  <Label htmlFor="signup-username" className="text-sm font-medium text-gray-700">
+                    Username
+                  </Label>
+                  <div className="mt-1 relative">
+                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <User className="h-5 w-5 text-gray-400" />
+                    </div>
+                    <Input 
+                      id="signup-username" 
+                      placeholder="Your username" 
+                      value={username} 
+                      onChange={(e) => setUsername(e.target.value)}
+                      disabled={isLoading}
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
                 <div>
                   <Label htmlFor="signup-pass" className="text-sm font-medium text-gray-700">
                     Create Password
@@ -209,7 +228,6 @@ export function AuthTab() {
                   </div>
                 </div>
               </div>
-
               <Button 
                 className="w-full bg-gray-800 hover:bg-gray-900 text-white font-medium py-3"
                 onClick={handleSignup}
@@ -240,6 +258,13 @@ export function AuthTab() {
                 </button>
               </p>
             </div>
+          </div>
+        </div>
+        {/* Formal Notice about username and regno */}
+        <div className="mt-6 text-center">
+          <div className="inline-block p-4 bg-yellow-50 border border-yellow-200 rounded text-yellow-900 text-sm max-w-md">
+            <strong>Friendly Reminder:</strong><br />
+            Please use your real name and registration number, and avoid any inappropriate or funny entries. Your information is safely hashed and stored. Using proper details helps everyone have a better experience on PlacementLog!
           </div>
         </div>
       </div>

@@ -17,7 +17,8 @@ import { Button } from "@/components/ui/button"
 
 export function Navbar() {
   const userContext = useContext(UserContext)
-  const user = userContext?.state
+  const user = userContext?.state;
+  // user now has userId, username, regno, token
   const navigate = useNavigate()
   const location = useLocation()
   const { dispatch } = React.useContext(UserContext)!

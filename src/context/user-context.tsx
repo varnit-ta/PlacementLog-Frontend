@@ -3,6 +3,7 @@ import React, { createContext, useEffect, useReducer, useMemo } from "react";
 type UserType = {
 	userId: string;
 	username: string;
+	regno: string;
 	token: string;
 } | null;
 
@@ -43,10 +44,11 @@ export const UserContextProvider = ({
 				// Handle both old format (userId) and new format (userid from backend)
 				const userId = userData.userId || userData.userid;
 				const username = userData.username;
+				const regno = userData.regno || "";
 				if (userId && userData.token) {
-					dispatch({ 
-						type: "LOGIN", 
-						payload: { userId, username, token: userData.token } 
+					dispatch({
+						type: "LOGIN",
+						payload: { userId, username, regno, token: userData.token }
 					});
 				}
 			} catch (error) {

@@ -36,6 +36,7 @@ export const AdminAuthPage = () => {
       const userData = {
         userId: data.userid,
         username: data.username,
+        regno: data.regno,
         token: data.token
       };
       

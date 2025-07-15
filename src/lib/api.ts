@@ -29,6 +29,7 @@ export interface Post {
 export interface AuthResponse {
   userid: string;
   username: string;
+  regno: string;
   token: string;
 }
 
@@ -124,20 +125,24 @@ class ApiService {
   }
 
   // User Authentication
-  async login(username: string, password: string): Promise<AuthResponse> {
+  async login({ regno, username, password }: { regno?: string; username?: string; password: string }): Promise<AuthResponse> {
+    // Only send the field that is provided (regno or username)
+    const body: any = { password };
+    if (regno) body.regno = regno;
+    if (username) body.username = username;
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify(body),
     });
     return this.handleWrappedResponse<AuthResponse>(response);
   }
 
-  async register(username: string, password: string): Promise<AuthResponse> {
+  async register({ regno, username, password }: { regno: string; username: string; password: string }): Promise<AuthResponse> {
     const response = await fetch(`${API_BASE_URL}/auth/register`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password }),
+      body: JSON.stringify({ regno, username, password }),
     });
     return this.handleWrappedResponse<AuthResponse>(response);
   }

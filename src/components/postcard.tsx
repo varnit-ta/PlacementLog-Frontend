@@ -79,7 +79,28 @@ export const PostCard = React.memo(({ post }: PostCardProps) => {
           </div>
           {/* Status Badge */}
           <div className="flex items-center space-x-2">
-            {post.reviewed === false ? (
+            {post.post_body?.status ? (
+              post.post_body.status === 'accepted' ? (
+                <div className="flex items-center space-x-1 px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-medium">
+                  <CheckCircle className="w-3 h-3" />
+                  <span>Accepted</span>
+                </div>
+              ) : post.post_body.status === 'rejected' || post.post_body.status === 'failed' ? (
+                <div className="flex items-center space-x-1 px-2 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">
+                  <AlertCircle className="w-3 h-3" />
+                  <span>{post.post_body.status.charAt(0).toUpperCase() + post.post_body.status.slice(1)}</span>
+                </div>
+              ) : post.post_body.status === 'pending' ? (
+                <div className="flex items-center space-x-1 px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">
+                  <AlertCircle className="w-3 h-3" />
+                  <span>Pending</span>
+                </div>
+              ) : (
+                <div className="flex items-center space-x-1 px-2 py-1 bg-gray-100 text-gray-800 rounded-full text-xs font-medium">
+                  <span>{post.post_body.status.charAt(0).toUpperCase() + post.post_body.status.slice(1)}</span>
+                </div>
+              )
+            ) : post.reviewed === false ? (
               <div className="flex items-center space-x-1 px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">
                 <AlertCircle className="w-3 h-3" />
                 <span>Pending</span>
@@ -97,7 +118,9 @@ export const PostCard = React.memo(({ post }: PostCardProps) => {
           <div className="w-6 h-6 bg-gray-200 rounded-full flex items-center justify-center">
             <User className="w-3 h-3 text-gray-600" />
           </div>
-          <span className="text-sm text-gray-600">by {post.user_id || user}</span>
+          <span className="text-sm text-gray-600">
+            by {post.username || post.post_body?.username || (post as any)?.regno || post.post_body?.regno || post.user_id || user}
+          </span>
         </div>
 
         {/* Details Grid */}

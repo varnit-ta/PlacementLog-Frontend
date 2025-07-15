@@ -17,6 +17,7 @@ export const AdminDashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { state: user } = useContext(UserContext)!;
+  // user now has userId, username, regno, token
 
   // Admin registration state
   const [newAdminUsername, setNewAdminUsername] = useState("");

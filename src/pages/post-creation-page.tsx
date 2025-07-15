@@ -26,6 +26,7 @@ export const PostCreationForm = () => {
 
   const userContext = useContext(UserContext);
   const currentUser = userContext?.state;
+  // currentUser now has userId, username, regno, token
   const dispatch = userContext?.dispatch;
   const navigate = useNavigate();
 
@@ -38,7 +39,17 @@ export const PostCreationForm = () => {
     }
   }, [dispatch]);
 
+  // Capitalize username for post body
+  function capitalizeName(name: string) {
+    return name
+      .split(' ')
+      .filter(Boolean)
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ');
+  }
+
   const handleSubmit = async () => {
+    console.log('Anonymous checked:', isAnonymous);
     if (!currentUser) {
       toast.error('Please log in to create a post');
       return;
@@ -62,7 +73,11 @@ export const PostCreationForm = () => {
       if (cgpa) postBody.cgpa = cgpa;
       if (rounds) postBody.rounds = parseInt(rounds);
       if (experience) postBody.experience = experience;
-      if (!isAnonymous && currentUser?.username) postBody.username = currentUser.username;
+      if (!isAnonymous) {
+        postBody.username = currentUser?.username ? capitalizeName(currentUser.username) : "Anonymous";
+      } else {
+        postBody.username = "Anonymous";
+      }
 
       await apiService.createPost(postBody);
       
