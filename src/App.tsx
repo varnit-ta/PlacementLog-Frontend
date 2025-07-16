@@ -36,8 +36,14 @@ export default function App() {
 							path="/admin"
 							element={user ? <AdminDashboard /> : <Navigate to="/admin-auth" />}
 						/>
-						<Route path="/auth" element={<AuthPage />} />
-						<Route path="/admin-auth" element={<AdminAuthPage />} />
+						<Route 
+							path="/auth" 
+							element={<AuthPage />} 
+						/>
+						<Route 
+							path="/admin-auth" 
+							element={<AdminAuthPage />} 
+						/>
 						<Route
 							path="/my-posts"
 							element={user ? <MyPosts /> : <Navigate to="/auth" />}
