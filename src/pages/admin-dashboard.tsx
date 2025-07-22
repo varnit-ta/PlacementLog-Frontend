@@ -11,6 +11,7 @@ import "@/styles/tiptap.css";
 import { PostCard } from "@/components/postcard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FixedSizeList as List } from "react-window";
+import { addPlacement } from "@/lib/placement-api";
 
 export const AdminDashboard = () => {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -24,6 +25,50 @@ export const AdminDashboard = () => {
   const [newAdminPassword, setNewAdminPassword] = useState("");
   const [isRegistering, setIsRegistering] = useState(false);
   const [registerSuccess, setRegisterSuccess] = useState<{ username: string; password: string } | null>(null);
+
+  // Placement form state
+  const [placementCompany, setPlacementCompany] = useState("");
+  const [placementCtc, setPlacementCtc] = useState("");
+  const [placementDate, setPlacementDate] = useState("");
+  const [studentIds, setStudentIds] = useState("");
+  const [isAddingPlacement, setIsAddingPlacement] = useState(false);
+
+  // Handle placement submit
+  const handleAddPlacement = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!placementCompany || !placementCtc || !placementDate || !studentIds.trim()) {
+      toast.error("Please fill all placement fields and student IDs");
+      return;
+    }
+    if (!user) {
+      toast.error("User not authenticated");
+      return;
+    }
+    setIsAddingPlacement(true);
+    try {
+      // Split studentIds by comma, space, or newline, and trim
+      const students = studentIds
+        .split(/[,\s]+/)
+        .map(s => s.trim())
+        .filter(Boolean);
+      await addPlacement({
+        company: placementCompany,
+        ctc: Number(placementCtc),
+        placement_date: placementDate,
+        students,
+      }, user.token);
+      toast.success("Placement added successfully!");
+      setPlacementCompany("");
+      setPlacementCtc("");
+      setPlacementDate("");
+      setStudentIds("");
+      await fetchPosts();
+    } catch (err: any) {
+      toast.error(err.message || "Failed to add placement");
+    } finally {
+      setIsAddingPlacement(false);
+    }
+  };
 
   useEffect(() => {
     if (!user) {
@@ -211,6 +256,75 @@ export const AdminDashboard = () => {
               </div>
             </div>
           </div>
+        </div>
+
+        {/* New Placement Form */}
+        <div className="mb-12 flex flex-col w-full">
+          <Card className="w-full border border-black bg-white text-black shadow-none">
+            <CardHeader className="pb-2 flex flex-col items-start">
+              <CardTitle className="text-xl font-semibold text-black flex items-center gap-2">
+                Add New Placement
+              </CardTitle>
+              <div className="text-sm text-gray-700 font-normal mt-1">Enter placement details and student IDs.</div>
+            </CardHeader>
+            <CardContent className="pt-0">
+              <form onSubmit={handleAddPlacement} className="flex flex-col gap-4">
+                <div className="flex flex-col gap-1">
+                  <Label htmlFor="placement-company" className="text-black">Company</Label>
+                  <Input
+                    id="placement-company"
+                    type="text"
+                    value={placementCompany}
+                    onChange={e => setPlacementCompany(e.target.value)}
+                    placeholder="Enter company name"
+                    autoComplete="off"
+                    disabled={isAddingPlacement}
+                    className="bg-white border border-black text-black placeholder-gray-500 focus:border-black focus:ring-0"
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <Label htmlFor="placement-ctc" className="text-black">CTC (LPA)</Label>
+                  <Input
+                    id="placement-ctc"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={placementCtc}
+                    onChange={e => setPlacementCtc(e.target.value)}
+                    placeholder="Enter CTC offered"
+                    autoComplete="off"
+                    disabled={isAddingPlacement}
+                    className="bg-white border border-black text-black placeholder-gray-500 focus:border-black focus:ring-0"
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <Label htmlFor="placement-date" className="text-black">Placement Date</Label>
+                  <Input
+                    id="placement-date"
+                    type="date"
+                    value={placementDate}
+                    onChange={e => setPlacementDate(e.target.value)}
+                    disabled={isAddingPlacement}
+                    className="bg-white border border-black text-black placeholder-gray-500 focus:border-black focus:ring-0"
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <Label htmlFor="placement-students" className="text-black">Student IDs</Label>
+                  <textarea
+                    id="placement-students"
+                    value={studentIds}
+                    onChange={e => setStudentIds(e.target.value)}
+                    placeholder="Enter student IDs (comma, space, or newline separated)"
+                    disabled={isAddingPlacement}
+                    className="bg-white border border-black text-black placeholder-gray-500 focus:border-black focus:ring-0 rounded p-2 min-h-[80px]"
+                  />
+                </div>
+                <Button type="submit" disabled={isAddingPlacement} className="w-full bg-black text-white hover:bg-gray-900">
+                  {isAddingPlacement ? "Adding..." : "Add Placement"}
+                </Button>
+              </form>
+            </CardContent>
+          </Card>
         </div>
 
         {/* Admin Registration Form */}

@@ -27,7 +27,7 @@ export async function addPlacement(
   placement: { company: string; ctc: number; placement_date: string; students: string[] },
   token: string
 ): Promise<Placement> {
-  const response = await fetch(`${API_BASE_URL}/placements`, {
+  const response = await fetch(`${API_BASE_URL}/admin/placements`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
