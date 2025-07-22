@@ -11,7 +11,8 @@ import {
   LogOut, 
   User,
   Menu,
-  List
+  List,
+  BarChart3
 } from "lucide-react"
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
@@ -114,6 +115,17 @@ export function Navbar() {
                       <span>My Posts</span>
                     </Link>
                   )}
+                  <Link
+                    to="/placement-stats"
+                    className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                      isActive("/placement-stats")
+                        ? "bg-gray-100 text-gray-900"
+                        : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+                    }`}
+                  >
+                    <BarChart3 className="w-4 h-4" />
+                    <span>Placement Stats</span>
+                  </Link>
                 </nav>
               </SheetContent>
             </Sheet>
@@ -173,6 +185,17 @@ export function Navbar() {
                 <span>My Posts</span>
               </Link>
             )}
+            <Link
+              to="/placement-stats"
+              className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                isActive("/placement-stats")
+                  ? "bg-gray-100 text-gray-900"
+                  : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
+              }`}
+            >
+              <BarChart3 className="w-4 h-4" />
+              <span>Placement Stats</span>
+            </Link>
           </div>
 
           {/* User Menu */}

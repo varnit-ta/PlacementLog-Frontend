@@ -9,6 +9,7 @@ import { UserContext } from "./context/user-context";
 import { AuthPage } from "./pages/auth-page";
 import { Toaster } from "./components/ui/sonner";
 import MyPosts from "./components/MyPosts";
+import { PlacementStats } from "./pages/placement-stats";
 
 export default function App() {
 	const userContext = useContext(UserContext);
@@ -47,6 +48,10 @@ export default function App() {
 						<Route
 							path="/my-posts"
 							element={user ? <MyPosts /> : <Navigate to="/auth" />}
+						/>
+						<Route
+							path="/placement-stats"
+							element={<PlacementStats />}
 						/>
 					</Routes>
 				</main>
