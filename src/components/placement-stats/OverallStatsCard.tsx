@@ -1,10 +1,9 @@
 import React from "react";
-import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { ChartContainer, ChartTooltip, ChartTooltipContent, type ChartConfig } from "@/components/ui/chart";
 import { CartesianGrid, Line, LineChart, XAxis, Bar, BarChart, LabelList } from "recharts";
 import { type Placement } from "@/lib/placement-api";
 import { groupSelectionsByDynamicRange } from "./utils";
-import { TrendingUp } from "lucide-react";
 
 interface OverallStatsCardProps {
   placements: Placement[];

@@ -291,24 +291,4 @@ const CompanyStatsTable: React.FC<CompanyStatsTableProps> = ({ companyBranch, pl
   );
 };
 
-// Simple tooltip component
-const Tooltip: React.FC<{ content: React.ReactNode; children: React.ReactNode }> = ({ content, children }) => {
-  const [show, setShow] = useState(false);
-  return (
-    <span style={{ position: "relative", display: "inline-block" }}
-      onMouseEnter={() => setShow(true)}
-      onMouseLeave={() => setShow(false)}
-    >
-      {children}
-      {show && (
-        <span style={{
-          position: "absolute", zIndex: 10, left: "50%", top: "100%", transform: "translateX(-50%)", background: "#222", color: "#fff", padding: "6px 10px", borderRadius: 6, fontSize: 12, whiteSpace: "pre-line", marginTop: 4, minWidth: 120, maxWidth: 240
-        }}>
-          {content}
-        </span>
-      )}
-    </span>
-  );
-};
-
 export default CompanyStatsTable; 
