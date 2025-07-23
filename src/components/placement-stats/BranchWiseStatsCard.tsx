@@ -3,22 +3,37 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/com
 import { ChartContainer, ChartTooltip, ChartTooltipContent, ChartStyle } from "@/components/ui/chart";
 import { Pie, PieChart, Sector, Label } from "recharts";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
-// Hash function to generate a color from a string (branch name)
-function branchToColor(branch: string): string {
-  let hash = 5381;
-  for (let i = 0; i < branch.length; i++) {
-    hash = (hash * 33) ^ branch.charCodeAt(i);
-  }
-  const hue = Math.abs(hash) % 360;
-  return `hsl(${hue}, 70%, 55%)`;
-}
+import {
+  type ColumnDef,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+  type SortingState,
+  type ColumnFiltersState,
+  type VisibilityState,
+} from "@tanstack/react-table";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { ArrowUpDown } from "lucide-react";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { calculateCtcStats, branchToColor } from "./utils";
 
 interface BranchWiseStatsCardProps {
   branchCompany: any[];
+  placements: import("@/lib/placement-api").Placement[];
 }
 
-const BranchWiseStatsCard: React.FC<BranchWiseStatsCardProps> = ({ branchCompany }) => {
+const BranchWiseStatsCard: React.FC<BranchWiseStatsCardProps> = ({ branchCompany, placements }) => {
   // Pie data: [{ branch, selections, fill }]
   const branchData = React.useMemo(() => {
     return branchCompany.map((b: any) => ({
@@ -35,6 +50,39 @@ const BranchWiseStatsCard: React.FC<BranchWiseStatsCardProps> = ({ branchCompany
   );
   const branches = React.useMemo(() => branchData.map((item) => item.branch), [branchData]);
 
+  // Get companies for the selected branch
+  const companiesForBranch = React.useMemo(() => {
+    const branchObj = branchCompany.find((b: any) => b.branch === activeBranch);
+    if (!branchObj) return [];
+    return branchObj.companies;
+  }, [activeBranch, branchCompany]);
+
+  // Precompute a lookup map: { [branch]: { [company]: { ctc, selectionDate } } }
+  const branchCompanyDetails = React.useMemo(() => {
+    const map: Record<string, Record<string, { ctc: string; selectionDate: string }>> = {};
+    placements.forEach((p) => {
+      p.branch_counts.forEach((b) => {
+        const branch = b.branch;
+        if (!map[branch]) map[branch] = {};
+        // Only set if not already set, to get the earliest placement
+        if (!map[branch][p.company]) {
+          let selectionDate = "-";
+          if (p.placement_date) {
+            const d = new Date(p.placement_date);
+            if (!isNaN(d.getTime())) {
+              selectionDate = d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+            }
+          }
+          map[branch][p.company] = {
+            ctc: typeof p.ctc === "number" ? `${p.ctc} LPA` : "-",
+            selectionDate,
+          };
+        }
+      });
+    });
+    return map;
+  }, [placements]);
+
   // Chart config for consistent color variables (optional, for ChartStyle)
   const chartConfig = React.useMemo(() => {
     const config: any = {};
@@ -47,6 +95,109 @@ const BranchWiseStatsCard: React.FC<BranchWiseStatsCardProps> = ({ branchCompany
     return config;
   }, [branchData]);
   const id = "pie-interactive-branch";
+
+  // Company table data for selected branch
+  const companyTableData = React.useMemo(() => {
+    return companiesForBranch.map((c: any) => {
+      const details = branchCompanyDetails[activeBranch]?.[c.company] || { ctc: "-", selectionDate: "-" };
+      return {
+        company: c.company,
+        ctc: details.ctc,
+        count: c.count,
+        selectionDate: details.selectionDate,
+      };
+    });
+  }, [companiesForBranch, branchCompanyDetails, activeBranch]);
+
+  // Calculate CTC stats for the selected branch
+  const branchCtcStats = React.useMemo(() => {
+    // Gather all CTCs for placements in the active branch
+    const ctcs: number[] = [];
+    placements.forEach((p) => {
+      if (p.branch_counts.some((b: any) => b.branch === activeBranch) && typeof p.ctc === "number" && !isNaN(p.ctc)) {
+        ctcs.push(p.ctc);
+      }
+    });
+    return calculateCtcStats(ctcs);
+  }, [placements, activeBranch]);
+
+  // Table columns
+  const columns = React.useMemo<ColumnDef<any>[]>(() => [
+    {
+      accessorKey: "company",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Company
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ row }) => <span>{row.getValue("company")}</span>,
+    },
+    {
+      accessorKey: "ctc",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          CTC
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ row }) => <span>{row.getValue("ctc")}</span>,
+    },
+    {
+      accessorKey: "count",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Count
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ row }) => <span>{row.getValue("count")}</span>,
+    },
+    {
+      accessorKey: "selectionDate",
+      header: ({ column }) => (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        >
+          Selection Date
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      ),
+      cell: ({ row }) => <span>{row.getValue("selectionDate")}</span>,
+    },
+  ], []);
+
+  // Table state
+  const [sorting, setSorting] = React.useState<SortingState>([]);
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+
+  const table = useReactTable({
+    data: companyTableData,
+    columns,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onColumnVisibilityChange: setColumnVisibility,
+    state: {
+      sorting,
+      columnFilters,
+      columnVisibility,
+    },
+  });
 
   return (
     <Card data-chart={id} className="flex flex-col">
@@ -75,7 +226,7 @@ const BranchWiseStatsCard: React.FC<BranchWiseStatsCardProps> = ({ branchCompany
                     className="flex h-3 w-3 shrink-0 rounded-xs"
                     style={{ backgroundColor: branchToColor(key) }}
                   />
-                  {key}
+                  {key.toUpperCase()}
                 </div>
               </SelectItem>
             ))}
@@ -154,9 +305,101 @@ const BranchWiseStatsCard: React.FC<BranchWiseStatsCardProps> = ({ branchCompany
                   className="inline-block h-3 w-3 rounded-sm border"
                   style={{ backgroundColor: d.fill }}
                 />
-                <span className="truncate" title={d.branch}>{d.branch}</span>
+                <span className="truncate" title={d.branch}>{d.branch.toUpperCase()}</span>
               </div>
             ))}
+          </div>
+        </div>
+        {/* Company table for selected branch */}
+        <div className="mt-6">
+          <div className="mb-4 grid grid-cols-2 gap-4">
+            <div className="rounded-lg bg-gray-50 p-4 flex flex-col items-center justify-center shadow-sm">
+              <span className="text-xs text-muted-foreground">Median CTC</span>
+              <div className="text-xl font-bold">{branchCtcStats.median.toFixed(2)} LPA</div>
+            </div>
+            <div className="rounded-lg bg-gray-50 p-4 flex flex-col items-center justify-center shadow-sm">
+              <span className="text-xs text-muted-foreground">Average CTC</span>
+              <div className="text-xl font-bold">{branchCtcStats.avg.toFixed(2)} LPA</div>
+            </div>
+            <div className="rounded-lg bg-gray-50 p-4 flex flex-col items-center justify-center shadow-sm">
+              <span className="text-xs text-muted-foreground">Max CTC</span>
+              <div className="text-xl font-bold">{branchCtcStats.max.toFixed(2)} LPA</div>
+            </div>
+            <div className="rounded-lg bg-gray-50 p-4 flex flex-col items-center justify-center shadow-sm">
+              <span className="text-xs text-muted-foreground">Min CTC</span>
+              <div className="text-xl font-bold">{branchCtcStats.min.toFixed(2)} LPA</div>
+            </div>
+          </div>
+          <h3 className="font-semibold mb-2 text-sm">Companies for {activeBranch.toUpperCase()}</h3>
+          <div className="flex items-center py-2">
+            <Input
+              placeholder="Filter companies..."
+              value={(table.getColumn("company")?.getFilterValue() as string) ?? ""}
+              onChange={(event) =>
+                table.getColumn("company")?.setFilterValue(event.target.value)
+              }
+              className="max-w-sm"
+            />
+          </div>
+          <div className="rounded-md border">
+            <Table>
+              <TableHeader>
+                {table.getHeaderGroups().map((headerGroup) => (
+                  <TableRow key={headerGroup.id}>
+                    {headerGroup.headers.map((header) => (
+                      <TableHead key={header.id}>
+                        {header.isPlaceholder
+                          ? null
+                          : flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )}
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                ))}
+              </TableHeader>
+              <TableBody>
+                {table.getRowModel().rows?.length ? (
+                  table.getRowModel().rows.map((row) => (
+                    <TableRow key={row.id}>
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={columns.length} className="h-24 text-center">
+                      No results.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+          <div className="flex items-center justify-end space-x-2 py-4">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.previousPage()}
+              disabled={!table.getCanPreviousPage()}
+            >
+              Previous
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => table.nextPage()}
+              disabled={!table.getCanNextPage()}
+            >
+              Next
+            </Button>
           </div>
         </div>
       </CardContent>

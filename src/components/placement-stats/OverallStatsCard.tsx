@@ -47,38 +47,43 @@ const OverallStatsCard: React.FC<OverallStatsCardProps> = ({ placements }) => {
     },
   };
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Total People Placed by Timeline</CardTitle>
-        <CardDescription>Shows the total number of people placed (by day, month, or year depending on data range)</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <ChartContainer config={chartConfig} className="h-[200px] sm:h-[300px] w-full max-w-full">
-          <LineChart
-            accessibilityLayer
-            data={chartData}
-            margin={{ left: 12, right: 12 }}
-          >
-            <CartesianGrid vertical={false} />
-            <XAxis
-              dataKey="label"
-              tickLine={false}
-              axisLine={false}
-              tickMargin={8}
-            />
-            <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
-            <Line
-              dataKey="selections"
-              type="linear"
-              stroke="var(--color-selections)"
-              strokeWidth={2}
-              dot={false}
-            />
-          </LineChart>
-        </ChartContainer>
-        {/* CTC Bar Chart */}
-        <div className="mt-8">
+    <>
+      <Card className="mb-8">
+        <CardHeader>
+          <CardTitle>Total People Placed by Timeline</CardTitle>
+          <CardDescription>Shows the total number of people placed (by day, month, or year depending on data range)</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ChartContainer config={chartConfig} className="h-[200px] sm:h-[300px] w-full max-w-full">
+            <LineChart
+              accessibilityLayer
+              data={chartData}
+              margin={{ left: 12, right: 12 }}
+            >
+              <CartesianGrid vertical={false} />
+              <XAxis
+                dataKey="label"
+                tickLine={false}
+                axisLine={false}
+                tickMargin={8}
+              />
+              <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+              <Line
+                dataKey="selections"
+                type="linear"
+                stroke="var(--color-selections)"
+                strokeWidth={2}
+                dot={false}
+              />
+            </LineChart>
+          </ChartContainer>
+        </CardContent>
+      </Card>
+      <Card>
+        <CardHeader>
           <CardTitle className="text-base mb-2">Placements by CTC Range</CardTitle>
+        </CardHeader>
+        <CardContent>
           <ChartContainer config={ctcBarConfig} className="h-[200px] w-full max-w-full">
             <BarChart
               accessibilityLayer
@@ -98,9 +103,9 @@ const OverallStatsCard: React.FC<OverallStatsCardProps> = ({ placements }) => {
               </Bar>
             </BarChart>
           </ChartContainer>
-        </div>
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </>
   );
 };
 

@@ -103,4 +103,16 @@ export function groupSelectionsByDynamicRange(placements: Placement[]): { label:
         return parseInt(a.label) - parseInt(b.label);
       }
     });
+}
+
+export function calculateCtcStats(ctcs: number[]) {
+  if (!ctcs.length) return { min: 0, max: 0, avg: 0, median: 0 };
+  const sorted = [...ctcs].sort((a, b) => a - b);
+  const min = sorted[0];
+  const max = sorted[sorted.length - 1];
+  const avg = sorted.reduce((a, b) => a + b, 0) / sorted.length;
+  const median = sorted.length % 2 === 1
+    ? sorted[Math.floor(sorted.length / 2)]
+    : (sorted[sorted.length / 2 - 1] + sorted[sorted.length / 2]) / 2;
+  return { min, max, avg, median };
 } 

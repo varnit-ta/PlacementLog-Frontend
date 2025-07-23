@@ -9,7 +9,7 @@ import { UserContext } from "./context/user-context";
 import { AuthPage } from "./pages/auth-page";
 import { Toaster } from "./components/ui/sonner";
 import MyPosts from "./components/MyPosts";
-import { PlacementStats } from "./pages/placement-stats";
+import PlacementStats from "./pages/placement-stats";
 
 export default function App() {
 	const userContext = useContext(UserContext);
