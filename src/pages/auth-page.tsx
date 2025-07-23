@@ -70,7 +70,7 @@ export function AuthTab() {
     setIsLoading(true);
     try {
       const formattedUsername = capitalizeName(username);
-      const data = await apiService.register({ regno: regNo, username: formattedUsername, password });
+      const data = await apiService.register({ regno: regNo.toLowerCase(), username: formattedUsername, password });
       const userData = {
         userId: data.userid,
         username: data.username,
