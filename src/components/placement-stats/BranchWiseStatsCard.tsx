@@ -59,7 +59,7 @@ const BranchWiseStatsCard: React.FC<BranchWiseStatsCardProps> = ({ branchCompany
 
   // Precompute a lookup map: { [branch]: { [company]: { ctc, selectionDate } } }
   const branchCompanyDetails = React.useMemo(() => {
-    const map: Record<string, Record<string, { ctc: string; selectionDate: string }>> = {};
+    const map: Record<string, Record<string, { ctc: number | null; selectionDate: string }>> = {};
     placements.forEach((p) => {
       p.branch_counts.forEach((b) => {
         const branch = b.branch;
@@ -74,7 +74,7 @@ const BranchWiseStatsCard: React.FC<BranchWiseStatsCardProps> = ({ branchCompany
             }
           }
           map[branch][p.company] = {
-            ctc: typeof p.ctc === "number" ? `${p.ctc} LPA` : "-",
+            ctc: typeof p.ctc === "number" ? p.ctc : null,
             selectionDate,
           };
         }
@@ -99,7 +99,7 @@ const BranchWiseStatsCard: React.FC<BranchWiseStatsCardProps> = ({ branchCompany
   // Company table data for selected branch
   const companyTableData = React.useMemo(() => {
     return companiesForBranch.map((c: any) => {
-      const details = branchCompanyDetails[activeBranch]?.[c.company] || { ctc: "-", selectionDate: "-" };
+      const details = branchCompanyDetails[activeBranch]?.[c.company] || { ctc: null, selectionDate: "-" };
       return {
         company: c.company,
         ctc: details.ctc,
@@ -143,11 +143,22 @@ const BranchWiseStatsCard: React.FC<BranchWiseStatsCardProps> = ({ branchCompany
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
         >
-          CTC
+          CTC (in LPA)
           <ArrowUpDown className="ml-2 h-4 w-4" />
         </Button>
       ),
-      cell: ({ row }) => <span>{row.getValue("ctc")}</span>,
+      cell: ({ row }) => {
+        const ctc = row.getValue("ctc");
+        return <span>{typeof ctc === "number" ? ctc : "-"}</span>;
+      },
+      sortingFn: (rowA, rowB, columnId) => {
+        const a = rowA.getValue(columnId);
+        const b = rowB.getValue(columnId);
+        if (typeof a !== "number" && typeof b !== "number") return 0;
+        if (typeof a !== "number") return 1;
+        if (typeof b !== "number") return -1;
+        return a - b;
+      },
     },
     {
       accessorKey: "count",
@@ -347,7 +358,7 @@ const BranchWiseStatsCard: React.FC<BranchWiseStatsCardProps> = ({ branchCompany
                 {table.getHeaderGroups().map((headerGroup) => (
                   <TableRow key={headerGroup.id}>
                     {headerGroup.headers.map((header) => (
-                      <TableHead key={header.id}>
+                      <TableHead key={header.id} className="text-center">
                         {header.isPlaceholder
                           ? null
                           : flexRender(
@@ -364,7 +375,7 @@ const BranchWiseStatsCard: React.FC<BranchWiseStatsCardProps> = ({ branchCompany
                   table.getRowModel().rows.map((row) => (
                     <TableRow key={row.id}>
                       {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
+                        <TableCell key={cell.id} className="text-center">
                           {flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext()

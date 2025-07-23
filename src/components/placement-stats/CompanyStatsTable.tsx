@@ -59,7 +59,7 @@ const CompanyStatsTable: React.FC<CompanyStatsTableProps> = ({ companyBranch, pl
       const firstDate = getEarliestDate(c.company);
       // Get the first available CTC for the company
       const ctcPlacement = placements.find((p) => p.company === c.company && typeof p.ctc === "number");
-      const ctc = ctcPlacement ? `${ctcPlacement.ctc} LPA` : "-";
+      const ctc = ctcPlacement ? ctcPlacement.ctc : null;
       return {
         id: idx.toString(),
         company: c.company,
@@ -111,11 +111,22 @@ const CompanyStatsTable: React.FC<CompanyStatsTableProps> = ({ companyBranch, pl
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
           >
-            CTC
+            CTC (in LPA)
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         ),
-        cell: ({ row }) => row.getValue("ctc"),
+        cell: ({ row }) => {
+          const ctc = row.getValue("ctc");
+          return <span>{typeof ctc === "number" ? ctc : "-"}</span>;
+        },
+        sortingFn: (rowA, rowB, columnId) => {
+          const a = rowA.getValue(columnId);
+          const b = rowB.getValue(columnId);
+          if (typeof a !== "number" && typeof b !== "number") return 0;
+          if (typeof a !== "number") return 1;
+          if (typeof b !== "number") return -1;
+          return a - b;
+        },
       },
       {
         accessorKey: "totalSelections",
