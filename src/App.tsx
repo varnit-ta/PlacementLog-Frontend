@@ -79,6 +79,14 @@ export default function App() {
 								>
 									Frontend Repository
 								</a>
+								<a
+									href="https://forms.gle/jSTDJA1XwPLYVrvk8"
+									target="_blank"
+									rel="noopener noreferrer"
+									className="text-gray-600 hover:text-gray-800 transition-colors"
+								>
+									Feedback & Suggestions
+								</a>
 							</div>
 						</div>
 					</div>
