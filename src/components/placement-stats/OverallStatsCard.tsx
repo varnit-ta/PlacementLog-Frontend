@@ -30,7 +30,7 @@ const OverallStatsCard: React.FC<OverallStatsCardProps> = ({ placements }) => {
       if (!Array.isArray(p.branch_counts)) return;
       const total = p.branch_counts.reduce((sum, b) => sum + (b.count || 0), 0);
       const ctc = p.ctc;
-      if (typeof ctc !== "number") return;
+      if (typeof ctc !== "number" || isNaN(ctc)) return;
       for (const r of counts) {
         if (ctc >= r.min && ctc < r.max) {
           r.count += total;

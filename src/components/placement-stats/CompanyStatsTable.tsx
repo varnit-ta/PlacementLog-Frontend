@@ -58,7 +58,7 @@ const CompanyStatsTable: React.FC<CompanyStatsTableProps> = ({ companyBranch, pl
     companyBranch.map((c, idx) => {
       const firstDate = getEarliestDate(c.company);
       // Get the first available CTC for the company
-      const ctcPlacement = placements.find((p) => p.company === c.company && typeof p.ctc === "number");
+      const ctcPlacement = placements.find((p) => p.company === c.company && typeof p.ctc === "number" && !isNaN(p.ctc));
       const ctc = ctcPlacement ? ctcPlacement.ctc : null;
       return {
         id: idx.toString(),
@@ -117,14 +117,16 @@ const CompanyStatsTable: React.FC<CompanyStatsTableProps> = ({ companyBranch, pl
         ),
         cell: ({ row }) => {
           const ctc = row.getValue("ctc");
-          return <span>{typeof ctc === "number" ? ctc : "-"}</span>;
+          return <span>{typeof ctc === "number" && !isNaN(ctc) ? ctc : "-"}</span>;
         },
         sortingFn: (rowA, rowB, columnId) => {
           const a = rowA.getValue(columnId);
           const b = rowB.getValue(columnId);
-          if (typeof a !== "number" && typeof b !== "number") return 0;
-          if (typeof a !== "number") return 1;
-          if (typeof b !== "number") return -1;
+          const isAValid = typeof a === "number" && !isNaN(a);
+          const isBValid = typeof b === "number" && !isNaN(b);
+          if (!isAValid && !isBValid) return 0;
+          if (!isAValid) return 1;
+          if (!isBValid) return -1;
           return a - b;
         },
       },

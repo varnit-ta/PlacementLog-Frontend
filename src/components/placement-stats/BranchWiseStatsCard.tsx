@@ -74,7 +74,7 @@ const BranchWiseStatsCard: React.FC<BranchWiseStatsCardProps> = ({ branchCompany
             }
           }
           map[branch][p.company] = {
-            ctc: typeof p.ctc === "number" ? p.ctc : null,
+            ctc: typeof p.ctc === "number" && !isNaN(p.ctc) ? p.ctc : null,
             selectionDate,
           };
         }
@@ -149,14 +149,16 @@ const BranchWiseStatsCard: React.FC<BranchWiseStatsCardProps> = ({ branchCompany
       ),
       cell: ({ row }) => {
         const ctc = row.getValue("ctc");
-        return <span>{typeof ctc === "number" ? ctc : "-"}</span>;
+        return <span>{typeof ctc === "number" && !isNaN(ctc) ? ctc : "-"}</span>;
       },
       sortingFn: (rowA, rowB, columnId) => {
         const a = rowA.getValue(columnId);
         const b = rowB.getValue(columnId);
-        if (typeof a !== "number" && typeof b !== "number") return 0;
-        if (typeof a !== "number") return 1;
-        if (typeof b !== "number") return -1;
+        const isAValid = typeof a === "number" && !isNaN(a);
+        const isBValid = typeof b === "number" && !isNaN(b);
+        if (!isAValid && !isBValid) return 0;
+        if (!isAValid) return 1;
+        if (!isBValid) return -1;
         return a - b;
       },
     },
