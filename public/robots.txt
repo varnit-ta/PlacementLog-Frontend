@@ -1,0 +1,16 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://placementlog.vercel.app/sitemap.xml
+
+# Disallow private pages
+Disallow: /admin
+Disallow: /admin-auth
+Disallow: /api/
+
+# Allow all public content
+Allow: /
+Allow: /placement-stats
+Allow: /auth
+Allow: /create

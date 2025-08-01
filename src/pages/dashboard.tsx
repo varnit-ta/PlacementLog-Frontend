@@ -6,6 +6,7 @@ import { Search, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FixedSizeList as List } from "react-window";
+import SEO from "@/components/SEO";
 
 export const Dashboard = () => {
   const postContext = useContext(PostsContext);
@@ -104,7 +105,14 @@ export const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen bg-white py-8">
+    <>
+      <SEO 
+        title="Placement Dashboard"
+        description="Discover placement experiences from students across different companies. Browse through real placement stories, interview experiences, and career insights."
+        keywords="placement experiences, job interviews, career insights, student placements, company reviews"
+        url="https://placementlog.vercel.app/"
+      />
+      <div className="min-h-screen bg-white py-8">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header Section */}
         <div className="mb-8">
@@ -190,5 +198,6 @@ export const Dashboard = () => {
         )}
       </div>
     </div>
+    </>
   );
 };

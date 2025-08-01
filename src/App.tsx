@@ -10,8 +10,11 @@ import { AuthPage } from "./pages/auth-page";
 import { Toaster } from "./components/ui/sonner";
 import MyPosts from "./components/MyPosts";
 import PlacementStats from "./pages/placement-stats";
+import StructuredData from "./components/StructuredData";
+import usePreloadResources from "./hooks/usePreloadResources";
 
 export default function App() {
+	usePreloadResources();
 	const userContext = useContext(UserContext);
 	const user = userContext?.state;
 	const loading = userContext?.loading;
@@ -23,6 +26,8 @@ export default function App() {
 
 	return (
 		<div className="min-h-screen bg-white flex flex-col">
+			<StructuredData type="WebSite" />
+			<StructuredData type="Organization" />
 			<BrowserRouter>
 				<Navbar />
 

@@ -2,6 +2,7 @@ import React from "react";
 import { PlacementsContextProvider, usePlacements } from "@/context/placements-context";
 import PlacementStatsTabs from "./PlacementStatsTabs";
 import { calculateCtcStats } from "./utils";
+import SEO from "@/components/SEO";
 
 function PlacementStatsContent() {
   const { state: placements, branchCompany, companyBranch, loading } = usePlacements();
@@ -22,17 +23,25 @@ function PlacementStatsContent() {
   }, [placements]);
 
   return (
-    <PlacementStatsTabs
-      placements={placements}
-      branchCompany={branchCompany}
-      companyBranch={companyBranch}
-      loading={loading}
-      minCtc={min}
-      maxCtc={max}
-      avgCtc={avg}
-      medianCtc={median}
-      totalStudentsPlaced={totalStudentsPlaced}
-    />
+    <>
+      <SEO 
+        title="Placement Statistics"
+        description="Comprehensive placement statistics including CTC data, company-wise placements, and branch-wise analytics. Get insights into placement trends and salary packages."
+        keywords="placement statistics, CTC data, salary packages, company placements, branch wise statistics"
+        url="https://placementlog.vercel.app/placement-stats"
+      />
+      <PlacementStatsTabs
+        placements={placements}
+        branchCompany={branchCompany}
+        companyBranch={companyBranch}
+        loading={loading}
+        minCtc={min}
+        maxCtc={max}
+        avgCtc={avg}
+        medianCtc={median}
+        totalStudentsPlaced={totalStudentsPlaced}
+      />
+    </>
   );
 }
 
