@@ -22,7 +22,7 @@ export default function App() {
 	// user now has userId, username, regno, token
 
 	return (
-		<div className="min-h-screen bg-white">
+		<div className="min-h-screen bg-white flex flex-col">
 			<BrowserRouter>
 				<Navbar />
 
@@ -35,7 +35,7 @@ export default function App() {
 						/>
 						<Route
 							path="/admin"
-							element={user ? <AdminDashboard /> : <Navigate to="/admin-auth" />}
+							element={user ? <AdminDashboard /> : <Navigate to="/admin" />}
 						/>
 						<Route 
 							path="/auth" 
@@ -56,7 +56,7 @@ export default function App() {
 					</Routes>
 				</main>
 
-				<footer className="bg-gray-100 border-t border-gray-200 py-6 mt-16">
+				<footer className="bg-gray-100 border-t border-gray-200 py-6 mt-auto">
 					<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 						<div className="text-center">
 							<p className="text-sm text-gray-600 mb-2">
