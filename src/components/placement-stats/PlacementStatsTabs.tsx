@@ -20,9 +20,10 @@ interface PlacementStatsTabsProps {
   maxCtc: number;
   avgCtc: number;
   medianCtc: number;
+  totalStudentsPlaced: number;
 }
 
-const PlacementStatsTabs: React.FC<PlacementStatsTabsProps> = ({ placements, branchCompany, companyBranch, loading, minCtc, maxCtc, avgCtc, medianCtc }) => {
+const PlacementStatsTabs: React.FC<PlacementStatsTabsProps> = ({ placements, branchCompany, companyBranch, loading, minCtc, maxCtc, avgCtc, medianCtc, totalStudentsPlaced }) => {
   const [activeTab, setActiveTab] = useState("overall");
 
   if (loading) {
@@ -72,7 +73,7 @@ const PlacementStatsTabs: React.FC<PlacementStatsTabsProps> = ({ placements, bra
           </TabsTrigger>
         </TabsList>
         <TabsContent value="overall">
-          <CtcStatsCards minCtc={minCtc} maxCtc={maxCtc} avgCtc={avgCtc} medianCtc={medianCtc} />
+          <CtcStatsCards minCtc={minCtc} maxCtc={maxCtc} avgCtc={avgCtc} medianCtc={medianCtc} totalStudentsPlaced={totalStudentsPlaced} />
           <OverallCtcLineChart placements={placements} />
           <OverallStatsCard placements={placements} />
         </TabsContent>

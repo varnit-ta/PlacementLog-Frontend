@@ -14,6 +14,13 @@ function PlacementStatsContent() {
   );
   const { min, max, avg, median } = React.useMemo(() => calculateCtcStats(ctcValues), [ctcValues]);
 
+  const totalStudentsPlaced = React.useMemo(() => {
+    return placements.reduce((total, placement) => {
+      const placementTotal = placement.branch_counts.reduce((sum, branch) => sum + (branch.count || 0), 0);
+      return total + placementTotal;
+    }, 0);
+  }, [placements]);
+
   return (
     <PlacementStatsTabs
       placements={placements}
@@ -24,6 +31,7 @@ function PlacementStatsContent() {
       maxCtc={max}
       avgCtc={avg}
       medianCtc={median}
+      totalStudentsPlaced={totalStudentsPlaced}
     />
   );
 }
