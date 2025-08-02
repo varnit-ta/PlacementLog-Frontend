@@ -1,12 +1,13 @@
 import { useEffect } from 'react';
 
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+
 // Preload critical resources
 const usePreloadResources = () => {
   useEffect(() => {
-    // Preload critical API endpoints
+    // Preload critical API endpoints that are used immediately
     const criticalEndpoints = [
-      'https://placementlog-backend.vercel.app/api/posts',
-      'https://placementlog-backend.vercel.app/api/placement-stats'
+      `${API_BASE_URL}/posts`
     ];
 
     criticalEndpoints.forEach(endpoint => {
@@ -15,6 +16,20 @@ const usePreloadResources = () => {
       link.as = 'fetch';
       link.href = endpoint;
       link.crossOrigin = 'anonymous';
+      document.head.appendChild(link);
+    });
+
+    // DNS prefetch for placement endpoints (used conditionally, not immediately)
+    const prefetchEndpoints = [
+      `${API_BASE_URL}/placements`,
+      `${API_BASE_URL}/placements/company-branch`,
+      `${API_BASE_URL}/placements/branch-company`
+    ];
+
+    prefetchEndpoints.forEach(endpoint => {
+      const link = document.createElement('link');
+      link.rel = 'dns-prefetch';
+      link.href = endpoint;
       document.head.appendChild(link);
     });
 
