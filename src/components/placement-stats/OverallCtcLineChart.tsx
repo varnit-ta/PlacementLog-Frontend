@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from "@/components/ui/card";
-import { LineChart, Line, CartesianGrid, XAxis } from "recharts";
+import { LineChart, Line, CartesianGrid, XAxis, YAxis } from "recharts";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { TrendingUp } from "lucide-react";
 import type { Placement } from "@/lib/placement-api";
@@ -32,9 +32,9 @@ const OverallCtcLineChart: React.FC<{ placements: Placement[] }> = ({ placements
       const date = new Date(p.placement_date);
       let key: string;
       if (granularity === 'day') {
-        key = date.toLocaleDateString('default', { day: '2-digit', month: 'short', year: 'numeric' });
+        key = date.toLocaleDateString('default', { day: '2-digit', month: 'short' });
       } else if (granularity === 'month') {
-        key = date.toLocaleDateString('default', { month: 'long', year: 'numeric' });
+        key = date.toLocaleDateString('default', { month: 'short', year: '2-digit' });
       } else {
         key = date.getFullYear().toString();
       }
@@ -43,12 +43,14 @@ const OverallCtcLineChart: React.FC<{ placements: Placement[] }> = ({ placements
     });
     const sortedKeys = Object.keys(binMap).sort((a, b) => {
       if (granularity === 'day') {
-        return new Date(a).getTime() - new Date(b).getTime();
+        const dateA = new Date(a + ` ${new Date().getFullYear()}`);
+        const dateB = new Date(b + ` ${new Date().getFullYear()}`);
+        return dateA.getTime() - dateB.getTime();
       } else if (granularity === 'month') {
         const [ma, ya] = a.split(' ');
         const [mb, yb] = b.split(' ');
-        const da = new Date(`${ma} 1, ${ya}`);
-        const db = new Date(`${mb} 1, ${yb}`);
+        const da = new Date(`${ma} 1, 20${ya}`);
+        const db = new Date(`${mb} 1, 20${yb}`);
         return da.getTime() - db.getTime();
       } else {
         return parseInt(a) - parseInt(b);
@@ -96,6 +98,12 @@ const OverallCtcLineChart: React.FC<{ placements: Placement[] }> = ({ placements
               axisLine={false}
               tickMargin={8}
             />
+            <YAxis
+              tickLine={false}
+              axisLine={false}
+              tickMargin={8}
+              tickFormatter={(value) => `₹${value}L`}
+            />
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />
             <Line
               dataKey="median"
@@ -103,6 +111,7 @@ const OverallCtcLineChart: React.FC<{ placements: Placement[] }> = ({ placements
               stroke="var(--chart-1)"
               strokeWidth={2}
               dot={false}
+              strokeDasharray="0"
             />
             <Line
               dataKey="avg"
@@ -110,6 +119,7 @@ const OverallCtcLineChart: React.FC<{ placements: Placement[] }> = ({ placements
               stroke="var(--chart-2)"
               strokeWidth={2}
               dot={false}
+              strokeDasharray="5 5"
             />
             <Line
               dataKey="max"
@@ -117,13 +127,23 @@ const OverallCtcLineChart: React.FC<{ placements: Placement[] }> = ({ placements
               stroke="var(--chart-3)"
               strokeWidth={2}
               dot={false}
+              strokeDasharray="2 3"
             />
           </LineChart>
         </ChartContainer>
         <div className="flex gap-6 justify-center mt-4">
-          <div className="flex items-center gap-2"><span className="inline-block w-4 h-2 rounded-full" style={{background:"var(--chart-1)"}}></span>Median</div>
-          <div className="flex items-center gap-2"><span className="inline-block w-4 h-2 rounded-full" style={{background:"var(--chart-2)"}}></span>Average</div>
-          <div className="flex items-center gap-2"><span className="inline-block w-4 h-2 rounded-full" style={{background:"var(--chart-3)"}}></span>Max</div>
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-2 border-t-2 border-solid" style={{borderColor:"var(--chart-1)"}}></div>
+            <span>Median</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-2 border-t-2 border-dashed" style={{borderColor:"var(--chart-2)"}}></div>
+            <span>Average</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-2 border-t-2 border-dotted" style={{borderColor:"var(--chart-3)"}}></div>
+            <span>Max</span>
+          </div>
         </div>
       </CardContent>
       <CardFooter>
