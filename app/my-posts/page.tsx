@@ -6,14 +6,21 @@ import { UserContext } from "@/context/user-context";
 import { PostCard } from "@/components/postcard";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import Editor from "@/components/editor";
+import LazyEditor from "@/components/LazyEditor";
 import { apiService } from "@/lib/api";
+import { apiCache } from "@/lib/cache";
 import { User, FileText, Edit, Trash2, AlertCircle } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import useResourcePreloader from "@/hooks/useResourcePreloader";
 
 export default function MyPostsPage() {
+  // Preload resources for better performance
+  useResourcePreloader();
+  
   const postsContext = useContext(PostsContext);
   const userContext = useContext(UserContext);
   const user = userContext?.state;
+  const isLoadingUser = userContext?.loading;
   const [editingPost, setEditingPost] = useState<any>(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [isDeleting, setIsDeleting] = useState<string | null>(null);
@@ -22,15 +29,78 @@ export default function MyPostsPage() {
   const [editExperience, setEditExperience] = useState("");
   const [loadingPosts, setLoadingPosts] = useState(false);
 
-  // Fetch posts if not loaded
+  // Fetch posts if not loaded and user is available
   useEffect(() => {
-    if (!postsContext?.state || postsContext.state.length === 0) {
+    if (!isLoadingUser && user && (!postsContext?.state || postsContext.state.length === 0)) {
       setLoadingPosts(true);
-      apiService.getAllPosts().then(posts => {
-        postsContext?.dispatch?.({ type: "ADD", payload: posts });
-      }).finally(() => setLoadingPosts(false));
+      
+      // Check cache first
+      const cacheKey = 'all-posts';
+      const cachedPosts = apiCache.get(cacheKey);
+      
+      if (cachedPosts) {
+        postsContext?.dispatch?.({ type: "ADD", payload: cachedPosts });
+        setLoadingPosts(false);
+      } else {
+        apiService.getAllPosts().then(posts => {
+          apiCache.set(cacheKey, posts); // Cache the posts
+          postsContext?.dispatch?.({ type: "ADD", payload: posts });
+        }).finally(() => setLoadingPosts(false));
+      }
     }
-  }, [postsContext]);
+  }, [postsContext, user, isLoadingUser]);
+
+  const myPosts = Array.isArray(postsContext?.state)
+    ? postsContext.state.filter((post) => post.user_id === user?.userId)
+    : [];
+
+  // Show loading skeleton while initializing user
+  if (isLoadingUser) {
+    return (
+      <div className="min-h-screen bg-white py-8">
+        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Header Skeleton */}
+          <div className="mb-8">
+            <div className="flex items-center space-x-4 mb-6">
+              <Skeleton className="w-12 h-12 rounded-full" />
+              <div>
+                <Skeleton className="w-32 h-8 mb-2" />
+                <Skeleton className="w-48 h-4" />
+              </div>
+            </div>
+          </div>
+
+          {/* Posts Skeleton */}
+          <div className="space-y-6">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div className="flex justify-between items-start mb-4">
+                  <div className="flex-1">
+                    <Skeleton className="w-32 h-6 mb-2" />
+                    <Skeleton className="w-48 h-4 mb-1" />
+                    <Skeleton className="w-24 h-4" />
+                  </div>
+                  <div className="flex space-x-2">
+                    <Skeleton className="w-8 h-8 rounded" />
+                    <Skeleton className="w-8 h-8 rounded" />
+                  </div>
+                </div>
+                <Skeleton className="w-full h-20 mb-4" />
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {[...Array(4)].map((_, j) => (
+                    <div key={j}>
+                      <Skeleton className="w-16 h-4 mb-1" />
+                      <Skeleton className="w-20 h-6" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (!user) {
     return (
@@ -47,10 +117,6 @@ export default function MyPostsPage() {
       </div>
     );
   }
-
-  const myPosts = Array.isArray(postsContext?.state)
-    ? postsContext.state.filter((post) => post.user_id === user.userId)
-    : [];
 
   const handleEdit = (post: any) => {
     setEditingPost(post);
@@ -132,7 +198,7 @@ export default function MyPostsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-white py-8">
+    <div className="min-h-screen bg-white py-8 animate-in fade-in duration-300">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
@@ -186,9 +252,31 @@ export default function MyPostsPage() {
 
         {/* Posts List */}
         {loadingPosts ? (
-          <div className="text-center text-gray-500 py-12">
-            <div className="w-8 h-8 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin mx-auto mb-4"></div>
-            Loading your posts...
+          <div className="space-y-6">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+                <div className="flex justify-between items-start mb-4">
+                  <div className="flex-1">
+                    <Skeleton className="w-32 h-6 mb-2" />
+                    <Skeleton className="w-48 h-4 mb-1" />
+                    <Skeleton className="w-24 h-4" />
+                  </div>
+                  <div className="flex space-x-2">
+                    <Skeleton className="w-8 h-8 rounded" />
+                    <Skeleton className="w-8 h-8 rounded" />
+                  </div>
+                </div>
+                <Skeleton className="w-full h-20 mb-4" />
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {[...Array(4)].map((_, j) => (
+                    <div key={j}>
+                      <Skeleton className="w-16 h-4 mb-1" />
+                      <Skeleton className="w-20 h-6" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
           </div>
         ) : myPosts.length === 0 ? (
           <div className="text-center py-16">
@@ -328,7 +416,7 @@ export default function MyPostsPage() {
                 <div className="mb-6">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Experience</label>
                   <div className="border border-gray-200 rounded-lg overflow-y-auto" style={{ minHeight: '200px', maxHeight: '300px' }}>
-                    <Editor
+                    <LazyEditor
                       onContentChange={setEditExperience}
                       value={editExperience}
                     />

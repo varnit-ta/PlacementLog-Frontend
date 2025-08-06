@@ -4,7 +4,7 @@ import * as React from "react"
 import Link from "next/link"
 import { useRouter, usePathname } from "next/navigation"
 import { UserContext } from "@/context/user-context"
-import { useContext } from "react"
+import { useContext, useMemo, useCallback } from "react"
 import { apiService } from "@/lib/api"
 import { 
   Home, 
@@ -19,14 +19,21 @@ import {
 } from "lucide-react"
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet"
 import { Button } from "@/components/ui/button"
+import { Skeleton } from "@/components/ui/skeleton"
 
 export function Navbar() {
   const userContext = useContext(UserContext)
   const user = userContext?.state;
+  const isLoadingUser = userContext?.loading;
   // user now has userId, username, regno, token
   const router = useRouter()
   const pathname = usePathname()
   const { dispatch } = React.useContext(UserContext)!
+
+  // Memoize admin check to avoid expensive operations on every render
+  const isAdmin = useMemo(() => {
+    return user ? apiService.isUserAdmin() : false;
+  }, [user?.token]);
 
   const handleSignOut = async () => {
     try {
@@ -40,8 +47,27 @@ export function Navbar() {
     }
   }
 
-  const isActive = (path: string) => pathname === path
-  const isAdmin = apiService.isUserAdmin()
+  const isActive = useCallback((path: string) => pathname === path, [pathname]);
+
+  // Show loading state while user context is initializing
+  if (isLoadingUser) {
+    return (
+      <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center">
+              <Skeleton className="w-32 h-6" />
+            </div>
+            <div className="hidden md:flex items-center space-x-4">
+              {[...Array(3)].map((_, i) => (
+                <Skeleton key={i} className="w-20 h-6" />
+              ))}
+            </div>
+          </div>
+        </div>
+      </nav>
+    );
+  }
 
   return (
     <nav className="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-50">

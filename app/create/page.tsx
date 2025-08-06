@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { useContext, useEffect, useState } from 'react';
-import Editor from '@/components/editor';
+import LazyEditor from '@/components/LazyEditor';
 import { UserContext } from '@/context/user-context';
 import { apiService } from '@/lib/api';
 import { useRouter } from 'next/navigation';
@@ -12,8 +12,13 @@ import { Building2, Briefcase, DollarSign, GraduationCap, Clock, FileText, Arrow
 import { toast } from 'sonner';
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "@/components/ui/select";
 import { Label as ShadLabel } from '@/components/ui/label';
+import { Skeleton } from '@/components/ui/skeleton';
+import useResourcePreloader from '@/hooks/useResourcePreloader';
 
 export default function PostCreationPage() {
+  // Preload resources for better performance
+  useResourcePreloader();
+  
   const [companyName, setCompanyName] = useState('');
   const [role, setRole] = useState('');
   const [ctc, setCtc] = useState('');
@@ -27,16 +32,8 @@ export default function PostCreationPage() {
   const userContext = useContext(UserContext);
   const currentUser = userContext?.state;
   const dispatch = userContext?.dispatch;
+  const isLoadingUser = userContext?.loading;
   const router = useRouter();
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      if (!dispatch)
-        return
-      dispatch({ type: "LOGIN", payload: JSON.parse(storedUser) });
-    }
-  }, [dispatch]);
 
   // Capitalize username for post body
   function capitalizeName(name: string) {
@@ -100,8 +97,73 @@ export default function PostCreationPage() {
     }
   };
 
+  // Show loading skeleton while initializing
+  if (isLoadingUser) {
+    return (
+      <div className="min-h-screen bg-white py-8">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Header Skeleton */}
+          <div className="mb-8">
+            <Skeleton className="w-32 h-4 mb-4" />
+            <div className="flex items-center space-x-4 mb-6">
+              <Skeleton className="w-12 h-12 rounded-xl" />
+              <div>
+                <Skeleton className="w-48 h-8 mb-2" />
+                <Skeleton className="w-64 h-4" />
+              </div>
+            </div>
+          </div>
+
+          {/* Form Skeleton */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+            <div className="mb-8">
+              <Skeleton className="w-32 h-6 mb-4" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <Skeleton className="w-24 h-4 mb-2" />
+                  <Skeleton className="w-full h-10" />
+                </div>
+                <div>
+                  <Skeleton className="w-24 h-4 mb-2" />
+                  <Skeleton className="w-full h-10" />
+                </div>
+              </div>
+            </div>
+
+            <Skeleton className="w-full h-px my-8" />
+
+            <div className="mb-8">
+              <Skeleton className="w-16 h-6 mb-4" />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i}>
+                    <Skeleton className="w-20 h-4 mb-2" />
+                    <Skeleton className="w-full h-10" />
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <Skeleton className="w-full h-px my-8" />
+
+            <div className="mb-8">
+              <Skeleton className="w-48 h-6 mb-4" />
+              <Skeleton className="w-full h-48 rounded-lg" />
+            </div>
+
+            <Skeleton className="w-32 h-4 mb-8" />
+
+            <div className="flex justify-end">
+              <Skeleton className="w-32 h-12" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-white py-8">
+    <div className="min-h-screen bg-white py-8 animate-in fade-in duration-300">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-8">
@@ -233,7 +295,7 @@ export default function PostCreationPage() {
           <div className="mb-8">
             <h2 className="text-lg font-semibold text-black mb-4">Experience & Interview Process</h2>
             <div className="border border-gray-200 rounded-lg">
-              <Editor
+              <LazyEditor
                 onContentChange={setExperience}
               />
             </div>

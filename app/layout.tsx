@@ -135,7 +135,7 @@ export default function RootLayout({
                     </a>
                     <a
                       href="https://github.com/varnit-ta/PlacementLog-Frontend"
-                      target="_blank"
+                      target="_top"
                       rel="noopener noreferrer"
                       className="text-gray-600 hover:text-gray-800 transition-colors"
                     >
@@ -143,7 +143,7 @@ export default function RootLayout({
                     </a>
                     <a
                       href="https://forms.gle/jSTDJA1XwPLYVrvk8"
-                      target="_blank"
+                      target="_top"
                       rel="noopener noreferrer"
                       className="text-gray-600 hover:text-gray-800 transition-colors"
                     >
