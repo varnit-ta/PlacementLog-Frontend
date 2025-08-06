@@ -70,7 +70,7 @@ export function Navbar() {
                 <nav className="flex flex-col gap-1 p-4">
                   <Link
                     href="/"
-                    className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-75 ${
                       isActive("/")
                         ? "bg-gray-100 text-gray-900"
                         : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
@@ -82,7 +82,7 @@ export function Navbar() {
                   {!isAdmin && user && (
                     <Link
                       href="/create"
-                      className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                      className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-75 ${
                         isActive("/create")
                           ? "bg-gray-100 text-gray-900"
                           : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
@@ -95,7 +95,7 @@ export function Navbar() {
                   {isAdmin && (
                     <Link
                       href="/admin-dashboard"
-                      className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                      className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-75 ${
                         isActive("/admin-dashboard")
                           ? "bg-gray-100 text-gray-900"
                           : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
@@ -108,7 +108,7 @@ export function Navbar() {
                   {!isAdmin && user && (
                     <Link
                       href="/my-posts"
-                      className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                      className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-75 ${
                         isActive("/my-posts")
                           ? "bg-gray-100 text-gray-900"
                           : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
@@ -120,7 +120,7 @@ export function Navbar() {
                   )}
                   <Link
                     href="/placement-stats"
-                    className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                    className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-75 ${
                       isActive("/placement-stats")
                         ? "bg-gray-100 text-gray-900"
                         : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
@@ -138,7 +138,7 @@ export function Navbar() {
           <div className="hidden md:flex items-center space-x-8">
             <Link
               href="/"
-              className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+              className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-75 ${
                 isActive("/") 
                   ? "bg-gray-100 text-gray-900" 
                   : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
@@ -151,7 +151,7 @@ export function Navbar() {
             {!isAdmin && (
               <Link
                 href="/create"
-                className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-75 ${
                   isActive("/create") 
                     ? "bg-gray-100 text-gray-900" 
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
@@ -165,7 +165,7 @@ export function Navbar() {
             {isAdmin && (
               <Link
                 href="/admin"
-                className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-75 ${
                   isActive("/admin") 
                     ? "bg-gray-100 text-gray-900" 
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
@@ -178,7 +178,7 @@ export function Navbar() {
             {!isAdmin && user && (
               <Link
                 href="/my-posts"
-                className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-75 ${
                   isActive("/my-posts") 
                     ? "bg-gray-100 text-gray-900" 
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
@@ -190,7 +190,7 @@ export function Navbar() {
             )}
             <Link
               href="/placement-stats"
-              className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+              className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-75 ${
                 isActive("/placement-stats")
                   ? "bg-gray-100 text-gray-900"
                   : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
@@ -215,7 +215,7 @@ export function Navbar() {
                 </div>
                 <button
                   onClick={handleSignOut}
-                  className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
+                  className="flex items-center space-x-2 px-3 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors duration-75"
                 >
                   <LogOut className="w-4 h-4" />
                   <span className="hidden sm:block">Logout</span>
@@ -225,14 +225,14 @@ export function Navbar() {
               <div className="flex items-center space-x-3">
                 <Link
                   href="/auth"
-                  className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors"
+                  className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-50 rounded-md transition-colors duration-75"
                 >
                   <LogIn className="w-4 h-4" />
                   <span className="hidden sm:block">Login</span>
                 </Link>
                 <Link
                   href="/admin-auth"
-                  className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-white bg-black hover:bg-gray-800 rounded-md transition-colors"
+                  className="flex items-center space-x-2 px-4 py-2 text-sm font-medium text-white bg-black hover:bg-gray-800 rounded-md transition-colors duration-75"
                 >
                   <Shield className="w-4 h-4" />
                   <span className="hidden sm:block">Admin</span>

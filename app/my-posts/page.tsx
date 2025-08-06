@@ -327,7 +327,7 @@ export default function MyPostsPage() {
                 
                 <div className="mb-6">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Experience</label>
-                  <div className="border border-gray-200 rounded-lg overflow-hidden" style={{ minHeight: '200px', maxHeight: '300px' }}>
+                  <div className="border border-gray-200 rounded-lg overflow-y-auto" style={{ minHeight: '200px', maxHeight: '300px' }}>
                     <Editor
                       onContentChange={setEditExperience}
                       value={editExperience}

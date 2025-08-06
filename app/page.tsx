@@ -9,6 +9,11 @@ import { toast } from "sonner";
 import { Skeleton } from "@/components/ui/skeleton";
 import { FixedSizeList as List } from "react-window";
 
+// Adding head metadata for better SEO
+if (typeof document !== 'undefined') {
+  document.title = "VIT Placement Log 2026 - Latest Placement Experiences & Company Updates";
+}
+
 export default function Dashboard() {
   const postContext = useContext(PostsContext);
   const dispatch = postContext?.dispatch;
@@ -126,10 +131,10 @@ export default function Dashboard() {
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900 mb-2">
-                Placement Dashboard
+                VIT Placement Dashboard 2026
               </h1>
               <p className="text-gray-600">
-                Discover placement experiences from students across different companies
+                Discover VIT placement experiences from students across different companies. Latest placement data for Vellore Institute of Technology 2026 batch.
               </p>
             </div>
             <div className="mt-4 sm:mt-0 flex items-center space-x-2">
