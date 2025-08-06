@@ -1,3 +1,5 @@
+"use client"
+
 import { useContext, useState, useEffect } from "react";
 import { PostsContext } from "@/context/posts-context";
 import { UserContext } from "@/context/user-context";
@@ -19,15 +21,19 @@ const MyPosts = () => {
   const [editExperience, setEditExperience] = useState("");
   const [loadingPosts, setLoadingPosts] = useState(false);
 
-  // Fetch posts if not loaded
+  // Fetch posts if not loaded - optimized to check if posts exist and contain current user's posts
   useEffect(() => {
-    if (!postsContext?.state || postsContext.state.length === 0) {
+    const userHasPosts = postsContext?.state?.some(post => post.user_id === user?.userId);
+    if (user && (!postsContext?.state || postsContext.state.length === 0 || !userHasPosts)) {
       setLoadingPosts(true);
       apiService.getAllPosts().then(posts => {
         postsContext?.dispatch?.({ type: "ADD", payload: posts });
+      }).catch(error => {
+        console.error("Error fetching posts:", error);
+        toast.error("Failed to load posts");
       }).finally(() => setLoadingPosts(false));
     }
-  }, [postsContext]);
+  }, [postsContext, user?.userId]);
 
   if (!user) {
     return <div className="py-8 text-center text-gray-600">Please log in to view your posts.</div>;

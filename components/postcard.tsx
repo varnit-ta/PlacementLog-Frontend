@@ -1,4 +1,4 @@
-// components/PostCard.tsx
+"use client"
 
 import {
   Accordion,

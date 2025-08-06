@@ -45,49 +45,51 @@ export const PlacementsContextProvider = ({ children }: { children: React.ReactN
   // Fetch placements from API
   const fetchPlacements = useCallback(async () => {
     try {
-      setLoading(true);
       const placements = await getAllPlacements();
       dispatch({ type: "SET_PLACEMENTS", payload: placements });
     } catch (e) {
-      // Optionally handle error
-    } finally {
-      setLoading(false);
+      console.error("Error fetching placements:", e);
     }
   }, [])
 
   // Fetch company to branch mapping
   const fetchCompanyBranch = useCallback(async () => {
     try {
-      setLoading(true);
       const companyBranchMapping = await getCompanyBranchMapping();
       setCompanyBranch(companyBranchMapping);
     } catch (e) {
-      // Optionally handle error
-    } finally {
-      setLoading(false);
+      console.error("Error fetching company branch mapping:", e);
     }
   }, []);
 
   // Fetch branch to company mapping
   const fetchBranchCompany = useCallback(async () => {
     try {
-      setLoading(true);
       const branchCompanyMapping = await getBranchCompanyMapping();
       setBranchCompany(branchCompanyMapping);
     } catch (e) {
-      // Optionally handle error
-    } finally {
-      setLoading(false);
+      console.error("Error fetching branch company mapping:", e);
     }
   }, []);
 
-  // Fetch all mappings and placements on mount
+  // Fetch all mappings and placements on mount with single loading state
   useEffect(() => {
-    Promise.all([
-      fetchPlacements(),
-      fetchCompanyBranch(),
-      fetchBranchCompany(),
-    ]).finally(() => setLoading(false));
+    const fetchAllData = async () => {
+      setLoading(true);
+      try {
+        await Promise.all([
+          fetchPlacements(),
+          fetchCompanyBranch(),
+          fetchBranchCompany(),
+        ]);
+      } catch (error) {
+        console.error("Error fetching placement data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAllData();
   }, [fetchPlacements, fetchCompanyBranch, fetchBranchCompany]);
 
   const value = useMemo(

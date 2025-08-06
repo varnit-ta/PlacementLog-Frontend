@@ -1,3 +1,5 @@
+"use client"
+
 import * as React from "react"
 import Link from "next/link"
 import { useRouter, usePathname } from "next/navigation"
@@ -49,7 +51,7 @@ export function Navbar() {
           <div className="flex items-center">
             <Link href="/" className="flex items-center space-x-2">
               <div className="w-8 h-8 rounded-lg flex items-center justify-center">
-                <img src="/vite.svg" alt="Logo" className="w-5 h-5" />
+                <img src="/vercel.svg" alt="Logo" className="w-5 h-5" />
               </div>
               <span className="text-xl font-bold text-gray-900">PlacementLog</span>
             </Link>
@@ -92,15 +94,15 @@ export function Navbar() {
                   )}
                   {isAdmin && (
                     <Link
-                      href="/admin"
+                      href="/admin-dashboard"
                       className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                        isActive("/admin")
+                        isActive("/admin-dashboard")
                           ? "bg-gray-100 text-gray-900"
                           : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                       }`}
                     >
                       <Shield className="w-4 h-4" />
-                      <span>Admin</span>
+                      <span>Admin Dashboard</span>
                     </Link>
                   )}
                   {!isAdmin && user && (
