@@ -19,33 +19,25 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "VIT Placement Log 2026 - Placement Data Tracker for Vellore Institute of Technology",
-  description: "Placement data tracker for Vellore Institute of Technology 2026 batch. Track VIT placements, company stats, salary packages, and placement experiences. Complete placement statistics for VIT students.",
+  title: "VIT Placement Log 2026 – Interactive Next.js Dashboard for VIT Placement Data",
+  description: "Track and explore real placement outcomes at VIT 2026. Browse company-wise statistics, student experiences, salary insights, and more through an intuitive, interactive dashboard.",
   keywords: [
     "vit placement",
     "vit placement 2026",
-    "vit placement 26",
-    "vellore institute of technology placement",
-    "vit placement statistics",
-    "vit placement data",
-    "vit placement tracker",
-    "vit placements 2026",
-    "vit placement records",
-    "vit campus placement",
-    "vit placement report",
-    "vit placement portal",
-    "vit placement experiences",
-    "vit placement companies",
-    "vit placement package",
-    "vit placement salary",
-    "vit chennai placement",
-    "vit vellore placement",
-    "vit bhopal placement",
-    "vit ap placement"
+    "placement dashboard",
+    "placement tracker",
+    "company stats",
+    "student experiences",
+    "vellore institute of technology",
+    "interactive dashboard",
+    "education",
+    "career insights",
+    "salary insights",
+    "recruitment data"
   ].join(", "),
-  authors: [{ name: "VIT Placement Log Team" }],
-  creator: "VIT Placement Log",
-  publisher: "VIT Placement Log",
+  authors: [{ name: "Varnit Singh" }],
+  creator: "Varnit Singh",
+  publisher: "Varnit Singh",
   robots: {
     index: true,
     follow: true,
@@ -62,23 +54,23 @@ export const metadata: Metadata = {
     locale: 'en_US',
     url: 'https://placement-log.vercel.app',
     siteName: 'VIT Placement Log 2026',
-    title: 'VIT Placement Log 2026 - Placement Data Tracker for Vellore Institute of Technology',
-    description: 'Placement data tracker for Vellore Institute of Technology 2026 batch. Track VIT placements, company stats, salary packages, and placement experiences.',
+    title: 'VIT Placement Log 2026 – Interactive Dashboard',
+    description: 'Discover real placement outcomes at VIT 2026: company stats, student stories, salary insights, and trends—delivered through an engaging, user-friendly interface.',
     images: [
       {
         url: '/og-image.png',
         width: 1200,
         height: 630,
-        alt: 'VIT Placement Log 2026 - Placement Data Tracker',
+        alt: 'VIT Placement Log 2026 – Dashboard Preview',
       },
     ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'VIT Placement Log 2026 - Placement Data Tracker',
-    description: 'Placement data tracker for Vellore Institute of Technology 2026 batch. Track placements, stats, and experiences.',
+    title: 'VIT Placement Log 2026 – Interactive Dashboard',
+    description: 'Explore placement outcomes at VIT 2026: company stats, student experiences, and salary insights in one place.',
     images: ['/og-image.png'],
-    creator: '@vitplacementlog',
+    creator: '@varnit_singh',
   },
   verification: {
     google: "_SUcqdcGs5wcNK8gecdpeewL_o1f-dCKtBnnFwoMRtE",
@@ -88,6 +80,7 @@ export const metadata: Metadata = {
   },
   category: 'education',
 };
+
 
 export default function RootLayout({
   children,

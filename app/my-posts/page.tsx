@@ -6,9 +6,8 @@ import { UserContext } from "@/context/user-context";
 import { PostCard } from "@/components/postcard";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import LazyEditor from "@/components/LazyEditor";
+import Editor from "@/components/editor";
 import { apiService } from "@/lib/api";
-import { apiCache } from "@/lib/cache";
 import { User, FileText, Edit, Trash2, AlertCircle } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import useResourcePreloader from "@/hooks/useResourcePreloader";
@@ -33,20 +32,9 @@ export default function MyPostsPage() {
   useEffect(() => {
     if (!isLoadingUser && user && (!postsContext?.state || postsContext.state.length === 0)) {
       setLoadingPosts(true);
-      
-      // Check cache first
-      const cacheKey = 'all-posts';
-      const cachedPosts = apiCache.get(cacheKey);
-      
-      if (cachedPosts) {
-        postsContext?.dispatch?.({ type: "ADD", payload: cachedPosts });
-        setLoadingPosts(false);
-      } else {
-        apiService.getAllPosts().then(posts => {
-          apiCache.set(cacheKey, posts); // Cache the posts
-          postsContext?.dispatch?.({ type: "ADD", payload: posts });
-        }).finally(() => setLoadingPosts(false));
-      }
+      apiService.getAllPosts().then(posts => {
+        postsContext?.dispatch?.({ type: "ADD", payload: posts });
+      }).finally(() => setLoadingPosts(false));
     }
   }, [postsContext, user, isLoadingUser]);
 
@@ -416,7 +404,7 @@ export default function MyPostsPage() {
                 <div className="mb-6">
                   <label className="block text-sm font-medium text-gray-700 mb-2">Experience</label>
                   <div className="border border-gray-200 rounded-lg overflow-y-auto" style={{ minHeight: '200px', maxHeight: '300px' }}>
-                    <LazyEditor
+                    <Editor
                       onContentChange={setEditExperience}
                       value={editExperience}
                     />

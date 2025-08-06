@@ -46,6 +46,10 @@ export default function PostCreationPage() {
 
   const handleSubmit = async () => {
     console.log('Anonymous checked:', isAnonymous);
+    if (isLoadingUser) {
+      toast.error('Please wait while we load your information');
+      return;
+    }
     if (!currentUser) {
       toast.error('Please log in to create a post');
       return;
@@ -97,70 +101,7 @@ export default function PostCreationPage() {
     }
   };
 
-  // Show loading skeleton while initializing
-  if (isLoadingUser) {
-    return (
-      <div className="min-h-screen bg-white py-8">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Header Skeleton */}
-          <div className="mb-8">
-            <Skeleton className="w-32 h-4 mb-4" />
-            <div className="flex items-center space-x-4 mb-6">
-              <Skeleton className="w-12 h-12 rounded-xl" />
-              <div>
-                <Skeleton className="w-48 h-8 mb-2" />
-                <Skeleton className="w-64 h-4" />
-              </div>
-            </div>
-          </div>
 
-          {/* Form Skeleton */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-            <div className="mb-8">
-              <Skeleton className="w-32 h-6 mb-4" />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <Skeleton className="w-24 h-4 mb-2" />
-                  <Skeleton className="w-full h-10" />
-                </div>
-                <div>
-                  <Skeleton className="w-24 h-4 mb-2" />
-                  <Skeleton className="w-full h-10" />
-                </div>
-              </div>
-            </div>
-
-            <Skeleton className="w-full h-px my-8" />
-
-            <div className="mb-8">
-              <Skeleton className="w-16 h-6 mb-4" />
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                {[...Array(4)].map((_, i) => (
-                  <div key={i}>
-                    <Skeleton className="w-20 h-4 mb-2" />
-                    <Skeleton className="w-full h-10" />
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <Skeleton className="w-full h-px my-8" />
-
-            <div className="mb-8">
-              <Skeleton className="w-48 h-6 mb-4" />
-              <Skeleton className="w-full h-48 rounded-lg" />
-            </div>
-
-            <Skeleton className="w-32 h-4 mb-8" />
-
-            <div className="flex justify-end">
-              <Skeleton className="w-32 h-12" />
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-white py-8 animate-in fade-in duration-300">
@@ -295,9 +236,25 @@ export default function PostCreationPage() {
           <div className="mb-8">
             <h2 className="text-lg font-semibold text-black mb-4">Experience & Interview Process</h2>
             <div className="border border-gray-200 rounded-lg">
-              <LazyEditor
-                onContentChange={setExperience}
-              />
+              {isLoadingUser ? (
+                // Editor skeleton while user context is loading
+                <div>
+                  <div className="border-b border-gray-200 p-2">
+                    <div className="flex space-x-2">
+                      {[...Array(8)].map((_, i) => (
+                        <Skeleton key={i} className="w-8 h-8 rounded" />
+                      ))}
+                    </div>
+                  </div>
+                  <div className="p-4">
+                    <Skeleton className="w-full h-32" />
+                  </div>
+                </div>
+              ) : (
+                <LazyEditor
+                  onContentChange={setExperience}
+                />
+              )}
             </div>
           </div>
 
@@ -319,13 +276,18 @@ export default function PostCreationPage() {
           <div className="flex justify-end">
             <Button
               onClick={handleSubmit}
-              disabled={isSubmitting}
-              className="bg-black hover:bg-gray-800 text-white px-8 py-3"
+              disabled={isSubmitting || isLoadingUser}
+              className="bg-black hover:bg-gray-800 text-white px-8 py-3 disabled:opacity-50"
             >
               {isSubmitting ? (
                 <div className="flex items-center space-x-2">
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
                   <span>Creating Post...</span>
+                </div>
+              ) : isLoadingUser ? (
+                <div className="flex items-center space-x-2">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <span>Loading...</span>
                 </div>
               ) : (
                 "Create Post"
