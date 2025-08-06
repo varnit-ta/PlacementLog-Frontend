@@ -164,7 +164,7 @@ export const PostCard = React.memo(({ post, hideStatusBadge = false }: PostCardP
                 </div>
               </AccordionTrigger>
               <AccordionContent className="pt-2">
-                <div className="prose prose-gray max-w-none bg-gray-50 rounded-lg shadow p-5 border border-gray-100">
+                <div className="prose prose-gray max-w-none bg-gray-50 rounded-lg shadow p-5 border border-gray-100 tiptap-content">
                   <div
                     className="prose max-w-none"
                     style={{ wordBreak: 'break-word' }}
