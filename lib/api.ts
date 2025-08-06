@@ -13,10 +13,10 @@ export interface PostBody {
   role?: string;
   ctc?: string;
   cgpa?: string;
-  rounds?: any;
+  rounds?: string | object | null;
   experience?: string;
   user?: string;
-  [key: string]: any;
+  [key: string]: string | object | null | undefined;
 }
 
 export interface Post {
@@ -137,7 +137,7 @@ class ApiService {
   // User Authentication
   async login({ regno, username, password }: { regno?: string; username?: string; password: string }): Promise<AuthResponse> {
     // Only send the field that is provided (regno or username)
-    const body: any = { password };
+    const body: { password: string; regno?: string; username?: string } = { password };
     if (regno) body.regno = regno;
     if (username) body.username = username;
     const response = await fetch(`${API_BASE_URL}/auth/login`, {
