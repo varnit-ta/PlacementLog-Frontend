@@ -6,6 +6,7 @@ import { PostsContextProvider } from "@/context/posts-context";
 import { Navbar } from "@/components/Navbar";
 import { Toaster } from "@/components/ui/sonner";
 import { StructuredData } from "@/components/StructuredData";
+import { VersionChecker } from "@/components/VersionChecker";
 import { Suspense } from "react";
 
 const geistSans = Geist({
@@ -99,6 +100,7 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen bg-white flex flex-col`}
       >
+        <VersionChecker />
         <UserContextProvider>
           <PostsContextProvider>
             <Navbar />
