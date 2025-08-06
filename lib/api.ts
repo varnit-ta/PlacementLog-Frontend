@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
 
 export interface User {
   userId: string;
@@ -61,11 +61,16 @@ class ApiService {
   }
 
   private getAuthHeaders(): HeadersInit {
-    const user = localStorage.getItem('user');
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
     };
 
+    // Ensure we're on the client side before accessing localStorage
+    if (typeof window === 'undefined') {
+      return headers;
+    }
+
+    const user = localStorage.getItem('user');
     if (user) {
       try {
         const userData = JSON.parse(user);
@@ -84,11 +89,16 @@ class ApiService {
   }
 
   private getAdminAuthHeaders(): HeadersInit {
-    const user = localStorage.getItem('user');
     const headers: HeadersInit = {
       'Content-Type': 'application/json',
     };
 
+    // Ensure we're on the client side before accessing localStorage
+    if (typeof window === 'undefined') {
+      return headers;
+    }
+
+    const user = localStorage.getItem('user');
     if (user) {
       try {
         const userData = JSON.parse(user);
@@ -252,6 +262,11 @@ class ApiService {
 
   // Helper method to check if user is admin
   isUserAdmin(): boolean {
+    // Ensure we're on the client side before accessing localStorage
+    if (typeof window === 'undefined') {
+      return false;
+    }
+
     const user = localStorage.getItem('user');
     if (!user) return false;
     
