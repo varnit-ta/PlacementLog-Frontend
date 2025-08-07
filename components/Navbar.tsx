@@ -190,9 +190,9 @@ export function Navbar() {
 
             {isAdmin && (
               <Link
-                href="/admin"
+                href="/admin-dashboard"
                 className={`flex items-center space-x-2 px-3 py-2 rounded-md text-sm font-medium transition-colors duration-75 ${
-                  isActive("/admin") 
+                  isActive("/admin-dashboard") 
                     ? "bg-gray-100 text-gray-900" 
                     : "text-gray-600 hover:text-gray-900 hover:bg-gray-50"
                 }`}
