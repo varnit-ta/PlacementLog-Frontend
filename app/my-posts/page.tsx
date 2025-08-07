@@ -1,6 +1,7 @@
 "use client";
 
 import { useContext, useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { PostsContext } from "@/context/posts-context";
 import { UserContext } from "@/context/user-context";
 import { PostCard } from "@/components/postcard";
@@ -16,6 +17,7 @@ export default function MyPostsPage() {
   // Preload resources for better performance
   useResourcePreloader();
   
+  const router = useRouter();
   const postsContext = useContext(PostsContext);
   const userContext = useContext(UserContext);
   const user = userContext?.state;
@@ -275,7 +277,7 @@ export default function MyPostsPage() {
             <p className="text-gray-600 mb-6">You haven't created any posts yet. Share your placement experience!</p>
             <Button 
               className="bg-black text-white hover:bg-gray-800"
-              onClick={() => window.location.href = '/create'}
+              onClick={() => router.push('/create')}
             >
               Create Your First Post
             </Button>

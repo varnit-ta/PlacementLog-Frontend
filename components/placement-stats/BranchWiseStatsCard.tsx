@@ -59,9 +59,9 @@ const BranchWiseStatsCard: React.FC<BranchWiseStatsCardProps> = ({ branchCompany
     return branchObj.companies;
   }, [activeBranch, branchCompany]);
 
-  // Precompute a lookup map: { [branch]: { [company]: { ctc, selectionDate } } }
+  // Precompute a lookup map: { [branch]: { [company]: { ctc, selectionDate, selectionDateRaw } } }
   const branchCompanyDetails = React.useMemo(() => {
-    const map: Record<string, Record<string, { ctc: number | null; selectionDate: string }>> = {};
+    const map: Record<string, Record<string, { ctc: number | null; selectionDate: string; selectionDateRaw: Date | null }>> = {};
     placements.forEach((p) => {
       p.branch_counts.forEach((b) => {
         const branch = b.branch;
@@ -69,15 +69,18 @@ const BranchWiseStatsCard: React.FC<BranchWiseStatsCardProps> = ({ branchCompany
         // Only set if not already set, to get the earliest placement
         if (!map[branch][p.company]) {
           let selectionDate = "-";
+          let selectionDateRaw: Date | null = null;
           if (p.placement_date) {
             const d = new Date(p.placement_date);
             if (!isNaN(d.getTime())) {
               selectionDate = d.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+              selectionDateRaw = d;
             }
           }
           map[branch][p.company] = {
             ctc: typeof p.ctc === "number" && !isNaN(p.ctc) ? p.ctc : null,
             selectionDate,
+            selectionDateRaw,
           };
         }
       });
@@ -101,12 +104,13 @@ const BranchWiseStatsCard: React.FC<BranchWiseStatsCardProps> = ({ branchCompany
   // Company table data for selected branch
   const companyTableData = React.useMemo(() => {
     return companiesForBranch.map((c: { company: string; count: number }) => {
-      const details = branchCompanyDetails[activeBranch]?.[c.company] || { ctc: null, selectionDate: "-" };
+      const details = branchCompanyDetails[activeBranch]?.[c.company] || { ctc: null, selectionDate: "-", selectionDateRaw: null };
       return {
         company: c.company,
         ctc: details.ctc,
         count: c.count,
         selectionDate: details.selectionDate,
+        selectionDateRaw: details.selectionDateRaw,
       };
     });
   }, [companiesForBranch, branchCompanyDetails, activeBranch]);
@@ -124,7 +128,7 @@ const BranchWiseStatsCard: React.FC<BranchWiseStatsCardProps> = ({ branchCompany
   }, [placements, activeBranch]);
 
   // Table columns
-  const columns = React.useMemo<ColumnDef<{ company: string; count: number; ctc: number | null; selectionDate: string }>[]>(() => [
+  const columns = React.useMemo<ColumnDef<{ company: string; count: number; ctc: number | null; selectionDate: string; selectionDateRaw: Date | null }>[]>(() => [
     {
       accessorKey: "company",
       header: ({ column }) => (
@@ -189,6 +193,18 @@ const BranchWiseStatsCard: React.FC<BranchWiseStatsCardProps> = ({ branchCompany
         </Button>
       ),
       cell: ({ row }) => <span>{row.getValue("selectionDate")}</span>,
+      sortingFn: (rowA, rowB, columnId) => {
+        const a = rowA.original.selectionDateRaw;
+        const b = rowB.original.selectionDateRaw;
+        
+        // Handle null dates - put them at the end
+        if (!a && !b) return 0;
+        if (!a) return 1;
+        if (!b) return -1;
+        
+        // Compare actual dates
+        return a.getTime() - b.getTime();
+      },
     },
   ], []);
 

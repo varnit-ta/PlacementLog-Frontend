@@ -18,6 +18,7 @@ import { History } from 'reactjs-tiptap-editor/history';
 import { Italic } from 'reactjs-tiptap-editor/italic';
 import { Link } from 'reactjs-tiptap-editor/link';
 import { OrderedList } from 'reactjs-tiptap-editor/orderedlist';
+import { SlashCommand } from 'reactjs-tiptap-editor/slashcommand';
 import { Strike } from 'reactjs-tiptap-editor/strike';
 import { TextUnderline } from 'reactjs-tiptap-editor/textunderline';
 
@@ -46,6 +47,7 @@ const extensions = [
   Link,
   Blockquote,
   Code.configure({ toolbar: false }),
+  SlashCommand,
 ];
 
 interface EditorProps {
