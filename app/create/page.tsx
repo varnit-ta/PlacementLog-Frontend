@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { useContext, useEffect, useState } from 'react';
-import LazyEditor from '@/components/LazyEditor';
+import Editor from '@/components/editor';
 import { UserContext } from '@/context/user-context';
 import { apiService } from '@/lib/api';
 import { useRouter } from 'next/navigation';
@@ -251,7 +251,7 @@ export default function PostCreationPage() {
                   </div>
                 </div>
               ) : (
-                <LazyEditor
+                <Editor
                   onContentChange={setExperience}
                 />
               )}
