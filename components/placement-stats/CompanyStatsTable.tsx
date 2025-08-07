@@ -124,6 +124,7 @@ const CompanyStatsTable: React.FC<CompanyStatsTableProps> = ({ companyBranch, pl
         branchBreakdown: c.branches.map((b: { branch: string; count: number }) => `${b.branch}: ${b.count}`).join(", "),
         branchBreakdownArray: c.branches,
         firstPlacementDate: firstDate ? firstDate.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : "-",
+        firstPlacementDateRaw: firstDate, // Keep the raw date for sorting
         ctc,
       };
     }),
@@ -160,6 +161,18 @@ const CompanyStatsTable: React.FC<CompanyStatsTableProps> = ({ companyBranch, pl
           </Button>
         ),
         cell: ({ row }) => row.getValue("firstPlacementDate"),
+        sortingFn: (rowA, rowB, columnId) => {
+          const a = rowA.original.firstPlacementDateRaw;
+          const b = rowB.original.firstPlacementDateRaw;
+          
+          // Handle null dates - put them at the end
+          if (!a && !b) return 0;
+          if (!a) return 1;
+          if (!b) return -1;
+          
+          // Compare actual dates
+          return a.getTime() - b.getTime();
+        },
       },
       {
         accessorKey: "ctc",
